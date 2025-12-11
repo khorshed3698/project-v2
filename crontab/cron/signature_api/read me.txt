@@ -1,2 +1,0 @@
-single url : http://localhost/signature/rest/user?signature_id=1
-all user url http://localhost/signature/rest/users
