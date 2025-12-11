@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Modules\LicenceApplication\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use App\Libraries\CommonFunction;
+
+class Sector extends Model {
+
+    protected $table = 'sector_info';
+    protected $primaryKey = 'id';
+    protected $fillable = [
+        'id',
+        'name',
+        'SECTR_ISIC_CODE',
+        'SECTR_TYPE',
+        'PARENT',
+        'DOC_REQUIRED'
+    ];
+
+    public static function boot() {
+        parent::boot();
+        // Before update
+        static::creating(function($post) {
+            $post->created_by = Auth::user()->id;
+            $post->updated_by = CommonFunction::getUserId();
+        });
+
+        static::updating(function($post) {
+            $post->updated_by = CommonFunction::getUserId();
+        });
+    }
+
+    /*     * *****************************End of Model Function********************************* */
+}

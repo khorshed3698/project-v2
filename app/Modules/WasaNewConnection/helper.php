@@ -1,0 +1,5 @@
+<?php
+
+/**
+ *	WasaNewConnection Helper  
+ */

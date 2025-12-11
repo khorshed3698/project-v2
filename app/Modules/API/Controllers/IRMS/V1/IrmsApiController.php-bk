@@ -1,0 +1,914 @@
+<?php
+
+namespace App\Modules\API\Controllers\IRMS\V1;
+
+use App\Http\Controllers\Controller;
+use App\Modules\API\Models\ApiClientMaster;
+use App\Modules\API\Models\ApiRequest;
+use App\Modules\API\Models\ApiResponse as ModelsApiResponse;
+use App\Modules\API\Models\ClientOauthToken;
+use App\Modules\API\Models\ClientIrmsRequestResponse;
+use App\Modules\API\Services\ApiResponse;
+use App\Modules\API\Services\ApiTokenServiceJwt;
+use App\Modules\BidaRegistration\Models\BidaRegistration;
+use App\Modules\BidaRegistration\Models\BusinessClass;
+use App\Modules\ProcessPath\Models\ProcessList;
+use App\Modules\Users\Models\CompanyInfo;
+use App\Modules\Users\Models\Countries;
+use App\Modules\Users\Models\Users;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
+
+
+class IrmsApiController extends Controller
+{
+    use ApiResponse;
+
+    public $message = '';
+    public $status_code = '';
+    public $response_data = '';
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getToken(Request $request)
+    {
+        try {
+
+            $client_id = trim($request->get('client_id'));
+            $client_secret_key = trim($request->get('client_secret_key'));
+
+            $clientData = $this->checkClient($client_id, $client_secret_key);
+
+            if (!$clientData) {
+                return $this->responseJson('Client information is not valid', 'BIDA-API-TOKEN', HTTPResponse::HTTP_UNAUTHORIZED);
+            }
+
+            // check whether Client IP/ URL is authorized to request
+            $isAuthorizedClientUrl = isAuthorizedClientUrl($clientData);
+            if ($isAuthorizedClientUrl['return_type'] === false) {
+                return $this->responseJson('Request could not be processed due to unauthorized ip/url: ' . $isAuthorizedClientUrl['return_data'], 'BIDA-API-TOKEN', HTTPResponse::HTTP_UNAUTHORIZED);
+            }
+
+            // JWT token generation
+            $tokenService = new ApiTokenServiceJwt();
+            $jwt_token_array = $tokenService->generateToken($clientData);
+            if ($jwt_token_array == null) {
+                return $this->responseJson('Token generation failed!', 'BIDA-API-TOKEN', HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            return $this->responseJson('Successfully generated token', 'BIDA-API-TOKEN', HTTPResponse::HTTP_OK, $jwt_token_array);
+
+        } catch (\Exception $e) {
+            Log::error('getToken: ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . ' [IRMS-1010]');
+            return $this->responseJson('Sorry ! An internal error has occurred.', 'BIDA-API-TOKEN', HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * @param $client_id
+     * @param $client_secret_key
+     *
+     * @return mixed
+     */
+    public function checkClient($client_id, $client_secret_key)
+    {
+        return ApiClientMaster::where([
+            'client_id' => $client_id,
+            'client_secret_key' => $client_secret_key,
+            'status' => 1
+        ])
+            ->first();
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+     public function feedbackRequestInitiate(Request $request)
+    {
+        $apache_request_headers = apache_request_headers();
+        $token = str_ireplace("bearer ", "", isset($apache_request_headers['Authorization']) ? $apache_request_headers['Authorization'] : '');
+
+        $requestData = [
+            //'ip' => getVisitorRealIP(),
+            'client_id' => trim($request->get('client_id')),
+            'client_secret_key' => trim($request->get('client_secret_key')),
+            //'token' => $token,
+            'tracking_number' => trim($request->get('tracking_number')),
+            'request_id' => trim($request->get('request_id')),
+            'request_at' => date("Y-m-d H:i:s"),
+            'deadline_date' => trim($request->get('deadline_date')),
+            'remarks' => trim($request->get('remarks')),
+        ];
+
+        try {
+            
+            // store request
+            $api_request_response = ClientIrmsRequestResponse::firstOrNew(['tracking_no' => $requestData['tracking_number']]);
+            
+            $api_request_response->initiate_response = json_encode($request->all());
+            $api_request_response->remarks = $requestData['remarks'];
+            
+            $api_request_response->save();
+     
+            // try {
+            //     $api_request_response = ClientIrmsRequestResponse::firstOrNew(['tracking_no' => $requestData['tracking_number']]);
+            //     $api_request_response->initiate_response = json_encode($request->all());
+            //     $api_request_response->remarks = $requestData['remarks'];
+            //     $api_request_response->save();
+            // } catch (\Exception $e) {
+            //     dd($e->getMessage());
+            // }
+           
+            // check whether bearer token exists in the request header
+            if (!empty($token)) {
+                
+                $clientData = ClientOauthToken::leftJoin('client_master', 'client_master.id', '=', 'client_oauth_token.client_master_id')
+                    ->where(['client_oauth_token.oauth_token' => $token, 'client_id' => $requestData['client_id'], 'client_secret_key' => $requestData['client_secret_key']])
+                    ->first([
+                        'client_master.*',
+                        'client_oauth_token.id as client_oauth_token_id',
+                        'client_oauth_token.oauth_token_expire_at',
+                    ]);
+
+                // Client information check
+                if ($clientData) {
+                    $api_request_response->client_master_id = $clientData->id;
+                    $api_request_response->client_oauth_token_id = $clientData->client_oauth_token_id;
+                    $api_request_response->request_id = $requestData['request_id'];
+                    $api_request_response->request_at = $requestData['request_at'];
+
+                    // if token is not expire then do this
+                    if (date('Y-m-d H:i:s') < $clientData->oauth_token_expire_at) {
+
+                        // Check token validity
+                        $tokenService = new ApiTokenServiceJwt();
+
+                        //if the token no is valid then do next step
+                        if ($tokenService->checkTokenValidity($token, $clientData->encryption_key)) {
+
+                            // check whether Client IP/ URL is authorized to request
+                            $isAuthorizedClientUrl = isAuthorizedClientUrl($clientData);
+                            if ($isAuthorizedClientUrl['return_type'] === true) {
+
+                                //tracking no and deadline date is required..
+                                if (!empty($requestData['tracking_number']) && !empty($requestData['deadline_date'])) {
+
+                                    $query = ProcessList::query();
+                                    $query->select('br_apps.irms_request_initiate', 'br_apps.id', 'process_list.tracking_no')
+                                        ->leftJoin('br_apps', 'br_apps.id', '=', 'process_list.ref_id');
+
+                                    //Invalid tracking no
+                                    if ($query->where('process_list.tracking_no', $requestData['tracking_number'])->count() > 0) {
+                                        //application not approved
+                                        if ($query->where('process_list.status_id', 25)->count() > 0) {
+                                            //duplicate tracking no check.
+                                            if ($query->value('irms_request_initiate') === 0) {
+                                                $this->message = 'Feedback request initiate successfully';
+                                                $this->status_code = HTTPResponse::HTTP_OK;
+                                                $this->response_data = $query->value('tracking_no');
+
+                                                //update br_apps table
+                                                BidaRegistration::where('id', $query->value('id'))->update([
+                                                    'irms_request_initiate' => 1,
+                                                    'irms_req_res_id' => $api_request_response->id
+                                                ]);
+
+                                                $api_request_response->feedback_deadline = date('Y-m-d', strtotime($requestData['deadline_date']));
+
+                                            } else {
+                                                $this->message = 'Duplicate request for this tracking number';
+                                                $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+                                            }
+                                        } else {
+                                            $this->message = 'Application is not approved';
+                                            $this->status_code = HTTPResponse::HTTP_NOT_FOUND;
+                                        }
+                                    } else {
+                                        $this->message = 'Invalid tracking number';
+                                        $this->status_code = HTTPResponse::HTTP_NOT_FOUND;
+                                    }
+                                } else {
+                                    $this->message = 'Tracking number or Deadline date not found from request';
+                                    $this->status_code = HTTPResponse::HTTP_BAD_REQUEST;
+                                }
+
+                            } else {
+                                $this->message = 'Request could not be processed due to unauthorized ip/url: ' . $isAuthorizedClientUrl['return_data'];
+                                $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+                            }
+
+                        } else {
+                            $this->message = 'Token is not valid';
+                            $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+                        }
+
+                    } else {
+                        $this->message = 'Client Token has been expired';
+                        $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+                    }
+
+                } else {
+                    $this->message = 'Client information is not valid';
+                    $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+                }
+            } else {
+                $this->message = 'Token not found in request header';
+                $this->status_code = HTTPResponse::HTTP_BAD_REQUEST;
+            }
+
+            $api_request_response->response_at = date("Y-m-d H:i:s");
+            $api_request_response->response_id = time() . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+
+            $responseEncode = $this->IrmsDataResponse($this->message, 'BIDA-REQUEST-INITIATE', $this->status_code, $this->response_data, $api_request_response->response_id, $api_request_response->response_at);
+            $api_request_response->response_json = json_encode($responseEncode, JSON_UNESCAPED_UNICODE);
+
+            $api_request_response->save();
+
+            return response()->json($responseEncode);
+
+        } catch (\Exception $e) {
+            Log::error('feedbackRequestInitiate: ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . ' [IRMS-1011]');
+            return response()->json($this->IrmsDataResponse('Sorry ! An internal error has occurred', 'BIDA-REQUEST-INITIATE', HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, $this->response_data, $api_request_response->response_id, $api_request_response->response_at));
+        }
+    }
+
+    public function BidaRegistrationDataProvider(Request $request)
+    {
+        $apache_request_headers = apache_request_headers();
+        $token = str_ireplace("bearer ", "", isset($apache_request_headers['Authorization']) ? $apache_request_headers['Authorization'] : '');
+
+        $tracking_no = trim($request->get('tracking_number'));
+        $request_id = trim($request->get('request_id'));
+        $request_at = date("Y-m-d H:i:s");
+
+
+        try {
+            // check whether bearer token exists in the request header
+            if (!empty($token)) {
+            
+                $clientData = $this->getClientData($token);
+
+                // Client information check
+                if ($clientData) {
+                    // store request
+                    $api_response = new ModelsApiResponse();
+                    $api_response->api_id = 5; // Feedback Data
+                    $api_response->external_request_id = $request_id;
+                    $api_response->endpoint = $request->fullUrl();
+                    $api_response->method = $request->method();
+                    $api_response->headers = '';
+                    $api_response->body = json_encode($request->all());
+                    $api_response->created_at = $request_at;
+                    $api_response->save();
+                    
+                    // if token is not expire then do this
+                    if (date('Y-m-d H:i:s') < $clientData->oauth_token_expire_at) {
+                        // Check token validity
+                        $tokenService = new ApiTokenServiceJwt();
+
+                        //if the token no is valid then do next step
+                        if ($tokenService->checkTokenValidity($token, $clientData->encryption_key)) {
+
+                            // check whether Client IP/ URL is authorized to request
+                            $isAuthorizedClientUrl = isAuthorizedClientUrl($clientData);
+                            if ($isAuthorizedClientUrl['return_type'] === true) {
+
+                                //tracking no and deadline date is required.. 
+                                if (!empty($tracking_no)) {
+
+                                    $brAppInfo = $this->getBrAppInfo($tracking_no);
+                                    
+                                    if (!empty($brAppInfo) && $brAppInfo->tracking_no == $tracking_no) {
+                                        //application not approved
+                                        if ($brAppInfo->status_id == 25) {
+                                            
+                                            $response_data = $this->getResponseData($brAppInfo);
+                                            $this->response_data = $response_data;
+
+                                            $this->message = 'Application data send successfully';
+                                            $this->status_code = HTTPResponse::HTTP_OK;
+                                        } else {
+                                            
+                                            $this->message = 'Application is not approved';
+                                            $this->status_code = HTTPResponse::HTTP_NOT_FOUND;
+                                        }
+                                    } else {
+                                        $this->message = 'Invalid tracking number';
+                                        $this->status_code = HTTPResponse::HTTP_NOT_FOUND;
+                                    }
+                                    
+                                } else {
+                                    $this->message = 'Tracking number not found from request';
+                                    $this->status_code = HTTPResponse::HTTP_BAD_REQUEST;
+                                }
+
+                            } else {
+                                $this->message = 'Request could not be processed due to unauthorized ip/url: ' . $isAuthorizedClientUrl['return_data'];
+                                $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+                            }
+
+                        } else {
+                            $this->message = 'Token is not valid';
+                            $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+                        }
+
+                    } else {
+                        $this->message = 'Client Token has been expired';
+                        $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+                    }
+
+                } else {
+                    $this->message = 'Client information is not valid';
+                    $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+                }
+            } else {
+                $this->message = 'Token not found in request header';
+                $this->status_code = HTTPResponse::HTTP_BAD_REQUEST;
+            }
+
+            $api_response->response_status_code = $this->status_code;
+            $api_response->response_headers = '';
+            $api_response->response_body = json_encode($this->response_data);
+            $api_response->response_id = time() . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            $api_response->updated_at = date("Y-m-d H:i:s");
+            $api_response->save();
+
+            $responseEncode = $this->IrmsDataResponse($this->message, 'BIDA-REQUEST-INITIATE', $this->status_code, $this->response_data, $api_response->response_id, $api_response->updated_at);
+            return response()->json($responseEncode);
+
+        } catch (\Exception $e) {
+            Log::error('BidaRegistrationDataProvider: ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . ' [IRMS-1012]');
+            return response()->json($this->IrmsDataResponse($this->message, 'BIDA-REQUEST-INITIATE', HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, $this->response_data, '', $api_response->updated_at));
+        }
+    }
+
+    public function getClientData($token) 
+    {
+        return ClientOauthToken::leftJoin('client_master', 'client_master.id', '=', 'client_oauth_token.client_master_id')
+        ->where(['client_oauth_token.oauth_token' => $token])
+        ->first([
+            'client_master.*',
+            'client_oauth_token.id as client_oauth_token_id',
+            'client_oauth_token.oauth_token_expire_at',
+        ]);
+    }
+
+    public function getBrAppInfo($tracking_no) 
+    {
+        $query = ProcessList::query();
+                                    
+        return $brAppInfo = $query->select(
+            'apps.*',
+            'process_list.tracking_no',
+            'process_list.status_id',
+            'ea_organization_status.name as organization_status_name',
+            'office_district.area_nm as office_district_name',
+            'office_thana.area_nm as office_thana_name',
+            'factory_district.area_nm as factory_district_name',
+            'factory_thana.area_nm as factory_thana_name',
+            'local_land_ivst_ccy_tbl.code as local_land_ivst_ccy_code',
+            'local_building_ivst_ccy_tbl.code as local_building_ivst_ccy_code',
+            'local_machinery_ivst_ccy_tbl.code as local_machinery_ivst_ccy_code',
+            'local_others_ivst_ccy_tbl.code as local_others_ivst_ccy_code',
+            'local_wc_ivst_ccy_tbl.code as local_wc_ivst_ccy_code'
+            )
+            ->leftJoin('br_apps as apps', 'apps.id', '=', 'process_list.ref_id')
+            ->leftJoin('ea_organization_status', 'ea_organization_status.id', '=', 'apps.organization_status_id')
+            ->leftJoin('area_info as office_district', 'office_district.area_id', '=', 'apps.office_district_id')
+            ->leftJoin('area_info as office_thana', 'office_thana.area_id', '=', 'apps.office_thana_id')
+            ->leftJoin('area_info as factory_district', 'factory_district.area_id', '=', 'apps.factory_district_id')
+            ->leftJoin('area_info as factory_thana', 'factory_thana.area_id', '=', 'apps.factory_thana_id')
+            ->leftJoin('currencies as local_land_ivst_ccy_tbl', 'local_land_ivst_ccy_tbl.id', '=', 'apps.local_land_ivst_ccy')
+            ->leftJoin('currencies as local_building_ivst_ccy_tbl', 'local_building_ivst_ccy_tbl.id', '=', 'apps.local_building_ivst_ccy')
+            ->leftJoin('currencies as local_machinery_ivst_ccy_tbl', 'local_machinery_ivst_ccy_tbl.id', '=', 'apps.local_machinery_ivst_ccy')
+            ->leftJoin('currencies as local_others_ivst_ccy_tbl', 'local_others_ivst_ccy_tbl.id', '=', 'apps.local_others_ivst_ccy')
+            ->leftJoin('currencies as local_wc_ivst_ccy_tbl', 'local_wc_ivst_ccy_tbl.id', '=', 'apps.local_wc_ivst_ccy')
+            ->where('process_list.tracking_no', $tracking_no)
+            ->first();
+            
+        
+    }
+
+    public function getResponseData($brAppInfo)
+    {
+
+        $response_data = [];
+
+        $sub_class = !empty($brAppInfo->sub_class_id) ? 
+                        BusinessClass::select('id', DB::raw("CONCAT(code, ' - ', name) as name"))
+                            ->where('id', $brAppInfo->sub_class_id)
+                            ->first() 
+                        : 
+                        null;
+
+        return $response_data = [
+            "general_data" => [
+                "name_of_organization" => $brAppInfo->company_name,
+                "name_of_project" => $brAppInfo->project_name,
+                "status_of_the_project" => [
+                    "id" => $brAppInfo->organization_status_id,
+                    "name" => $brAppInfo->organization_status_name,
+                ],
+                "sector_sub_sector" => [
+                    "id" => !empty($brAppInfo->sub_class_id) ? $brAppInfo->sub_class_id : null,
+                    "name" =>  !empty($sub_class) ? $sub_class->name : null,
+                ],
+            ],
+            "office_address" => [
+                "district" => [
+                    "id" => $brAppInfo->office_district_id,
+                    "name" => $brAppInfo->office_district_name,
+                ],
+                "police_station" => [
+                    "id" => $brAppInfo->office_thana_id,
+                    "name" => $brAppInfo->office_thana_name,
+                ],
+                "address" => $brAppInfo->office_address,
+            ],
+
+            "factory_address" => [
+                "district" => [
+                    "id" => $brAppInfo->factory_district_id,
+                    "name" => $brAppInfo->factory_district_name,
+                ],
+                "police_station" => [
+                    "id" => $brAppInfo->factory_thana_id,
+                    "name" => $brAppInfo->factory_thana_name,
+                ],
+                "address" => $brAppInfo->factory_address,
+            ],
+            
+            "information_of_principal_promoter" => [
+                "name" => $brAppInfo->ceo_full_name,
+                "mobile" => $brAppInfo->ceo_mobile_no,
+                "desgination" => $brAppInfo->ceo_designation,
+                "email" => $brAppInfo->ceo_email,
+            ],
+
+            "investment" => [
+                "land" => [
+                    "amount" => $brAppInfo->local_land_ivst,
+                    "currency" => [
+                        "id" => $brAppInfo->local_land_ivst_ccy,
+                        "code" => $brAppInfo->local_land_ivst_ccy_code,
+                    ],
+                ],
+                "building" => [
+                    "amount" => $brAppInfo->local_building_ivst,
+                    "currency" => [
+                        "id" => $brAppInfo->local_building_ivst_ccy,
+                        "code" => $brAppInfo->local_building_ivst_ccy_code,
+                    ],
+                ],
+                "machinery_and_equipment" => [
+                    "amount" => $brAppInfo->local_machinery_ivst,
+                    "currency" => [
+                        "id" => $brAppInfo->local_machinery_ivst_ccy,
+                        "code" => $brAppInfo->local_machinery_ivst_ccy_code,
+                    ],
+                ],
+                "others" => [
+                    "amount" => $brAppInfo->local_others_ivst,
+                    "currency" => [
+                        "id" => $brAppInfo->local_others_ivst_ccy,
+                        "code" => $brAppInfo->local_others_ivst_ccy_code,
+                    ],
+                ],
+                "working_capital" => [
+                    "amount" => $brAppInfo->local_wc_ivst,
+                    "currency" => [
+                        "id" => $brAppInfo->local_wc_ivst_ccy,
+                        "code" => $brAppInfo->local_wc_ivst_ccy_code,
+                    ],
+                ],
+                "total_investment(million)(BDT)" => $brAppInfo->total_fixed_ivst_million,
+                "Total Investment(BDT)" => $brAppInfo->total_fixed_ivst,
+                "Total Fee (BDT)" => $brAppInfo->total_fee,
+                
+            ],
+            "manpower_of_the_organization" => [
+                "local" => [
+                    "executive" => $brAppInfo->local_male,
+                    "supporting_staff" => $brAppInfo->local_female,
+                    "total" => $brAppInfo->local_total,
+                ],
+                "foreign" => [
+                    "executive" => $brAppInfo->foreign_male,
+                    "supporting_staff" => $brAppInfo->foreign_female,
+                    "total" => $brAppInfo->foreign_total,
+                ],
+                "grand_total" => $brAppInfo->manpower_total,
+                "ratio" => [
+                    "local" => $brAppInfo->manpower_local_ratio,
+                    "foreign" => $brAppInfo->manpower_foreign_ratio,
+                ],
+            ],
+            "date_of_commercial_operation" => $brAppInfo->commercial_operation_date,
+            "authorized_persion_of_the_organization" => [
+                "full_name" => $brAppInfo->auth_full_name,
+                "mobile_no" => $brAppInfo->auth_mobile_no,
+                "email" => $brAppInfo->auth_email,
+            ]
+        ];
+
+    }
+
+    /**
+     * IRMS Instant Request Notification
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+
+    public function apiIrnRequest(Request $request)
+    {
+        $requestData = [
+            'client_id' => trim($request->get('client_id')),
+            'client_secret_key' => trim($request->get('client_secret_key')),
+            'tracking_number' => trim($request->get('tracking_number')),
+            'status_id' => trim($request->get('status_id')),
+            'deadline_date' => $request->has('deadline_date') ? trim($request->get('deadline_date')) : null,
+            'request_id' => trim($request->get('request_id')),
+            'request_at' => date("Y-m-d H:i:s"),
+        ];
+
+        try {
+            // checking here client is valid or not..
+            $clientData = $this->checkClient($requestData['client_id'], $requestData['client_secret_key']);
+
+            if (!$clientData) {
+                return $this->IrnDataResponse('Client information is not valid','BIDA-IRN-RESPONSE', HTTPResponse::HTTP_UNAUTHORIZED);
+            }
+
+            $api_request_response = ClientIrmsRequestResponse::where('tracking_no', $requestData['tracking_number'])->first();
+            if (empty($api_request_response)) {
+                return $this->IrnDataResponse('Tracking number is not valid', 'BIDA-CALLBACK-RESPONSE',HTTPResponse::HTTP_UNAUTHORIZED);
+            }
+
+            $api_request_response->irn_response = json_encode($request->all());
+            $api_request_response->client_master_id = $clientData->id;
+            $api_request_response->request_id = $requestData['request_id'];
+            $api_request_response->request_at = $requestData['request_at'];
+
+            // check whether Client IP/ URL is authorized to request
+            if (isAuthorizedClientUrl($clientData)['return_type'] === true) {
+
+                //tracing no or status empty value check,
+                if (!empty($requestData['tracking_number']) && !empty($requestData['status_id'])) {
+                    $query = ProcessList::query();
+                    $query->select('br_apps.irms_request_initiate', 'br_apps.id', 'process_list.tracking_no', 'process_list.status_id', 'irr.status_id as irms_status_id')
+                        ->leftJoin('br_apps', 'br_apps.id', '=', 'process_list.ref_id')
+                        ->leftJoin('client_irms_request_response as irr', 'irr.id', '=', 'br_apps.irms_req_res_id');
+
+                    //checking application tracking is exist and approved = 25
+                    if ($query->where(['process_list.tracking_no' => $requestData['tracking_number'], 'process_list.status_id' => 25])->count() > 0) {
+
+                        //IRMS request initiated or not checking here
+                        if ($query->value('irms_request_initiate') === 1) {
+
+                            //irms application is already approved
+                            if ($query->value('irms_status_id') === 25) {
+                                $this->message = 'Duplicate request for this tracking number';
+                                $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+
+                            } else {
+                                $this->message = 'The request has been processed successfully';
+                                $this->status_code = HTTPResponse::HTTP_OK;
+
+                                // update status
+                                $api_request_response->status_id = $requestData['status_id'];
+
+                                if (!empty($requestData['deadline_date'])) {
+                                    $api_request_response->feedback_deadline = date('Y-m-d', strtotime($requestData['deadline_date']));
+                                }
+
+                                // Destroy session data
+                                if (Session::has('irms_feedback_tracking_number')) {
+                                    Session()->pull('irms_feedback_tracking_number.'.$requestData['tracking_number']);
+                                }
+                            }
+
+                        } else {
+                            $this->message = 'This tracking number is not initiated';
+                            $this->status_code = HTTPResponse::HTTP_NOT_FOUND;
+                        }
+
+                    } else {
+                        $this->message = 'Invalid tracking number';
+                        $this->status_code = HTTPResponse::HTTP_NOT_FOUND;
+                    }
+
+                } else {
+                    $this->message = 'Tracking number or status not found from the request';
+                    $this->status_code = HTTPResponse::HTTP_NOT_FOUND;
+                }
+
+            } else {
+                $this->message = 'Request could not be processed due to unauthorized ip or credentials';
+                $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+            }
+
+            $api_request_response->response_at = date("Y-m-d H:i:s");
+            $api_request_response->response_id = time() . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+
+            $responseEncode = $this->IrnDataResponse($this->message, 'BIDA-IRN-RESPONSE',  $api_request_response->response_id, $this->status_code);
+            $api_request_response->response_json = json_encode($responseEncode, JSON_UNESCAPED_UNICODE);
+
+            $api_request_response->save();
+
+            return response()->json($responseEncode);
+        }catch (\Exception $e) {
+            Log::error('apiIrnRequest: ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . ' [IRMS-1014]');
+            return response()->json($this->IrnDataResponse('Sorry ! An internal error has occurred', 'BIDA-IRN-RESPONSE', $api_request_response->response_id,HTTPResponse::HTTP_INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    public function callBack(Request $request)
+    {
+        // checking all request information
+        if (empty($request->get('client_id')) || empty($request->get('client_secret_key')) ||
+            empty($request->get('tracking_number')) || empty($request->get('status_id')) ||
+            empty($request->get('request_id'))) {
+            return $this->IrnDataResponse('Request information is missing', 'BIDA-CALLBACK-RESPONSE',HTTPResponse::HTTP_UNAUTHORIZED);
+        }
+
+        $requestData = [
+            'client_id' => trim($request->get('client_id')),
+            'client_secret_key' => trim($request->get('client_secret_key')),
+            'tracking_number' => trim($request->get('tracking_number')),
+            'status_id' => trim($request->get('status_id')),
+            'request_id' => trim($request->get('request_id')),
+            'request_at' => date("Y-m-d H:i:s"),
+        ];
+
+        try {
+
+            // checking here client is valid or not.
+            $clientData = $this->checkClient($requestData['client_id'], $requestData['client_secret_key']);
+            if (!$clientData) {
+                return $this->IrnDataResponse('Client information is not valid', 'BIDA-CALLBACK-RESPONSE',HTTPResponse::HTTP_UNAUTHORIZED);
+            }
+
+            $api_request_response = ClientIrmsRequestResponse::where('tracking_no', $requestData['tracking_number'])->first();
+            if (empty($api_request_response)) {
+                return $this->IrnDataResponse('Tracking number is not valid', 'BIDA-CALLBACK-RESPONSE',HTTPResponse::HTTP_UNAUTHORIZED);
+            }
+
+            $api_request_response->callback_response = json_encode($request->all());
+            $api_request_response->client_master_id = $clientData->id;
+            $api_request_response->request_id = $requestData['request_id'];
+            $api_request_response->request_at = $requestData['request_at'];
+
+            // check whether Client IP/ URL is authorized to request
+            if (isAuthorizedClientUrl($clientData)['return_type'] === true) {
+
+                //tracing number or status empty value check,
+                if (!empty($requestData['tracking_number']) && !empty($requestData['status_id'])) {
+                    $query = ProcessList::query();
+                    $query->select('br_apps.irms_request_initiate', 'br_apps.id', 'process_list.tracking_no', 'process_list.status_id', 'irr.status_id as irms_status_id')
+                        ->leftJoin('br_apps', 'br_apps.id', '=', 'process_list.ref_id')
+                        ->leftJoin('client_irms_request_response as irr', 'irr.id', '=', 'br_apps.irms_req_res_id');
+
+                    // checking application tracking is exist and approved = 25
+                    if ($query->where(['process_list.tracking_no' => $requestData['tracking_number'], 'process_list.status_id' => 25])->count() > 0) {
+
+                        // IRMS request initiated or not checking here
+                        if ($query->value('irms_request_initiate') === 1) {
+
+                            // irms application is already approved
+                            if ($query->value('irms_status_id') === 25) {
+                                $this->message = 'Duplicate request for this tracking number';
+                                $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+
+                            } else {
+                                $this->message = 'The request has been processed successfully';
+                                $this->status_code = HTTPResponse::HTTP_OK;
+
+                                // update status
+                                $api_request_response->status_id = $requestData['status_id'];
+
+                                // Destroy session data
+                                if (Session::has('irms_feedback_tracking_number')) {
+                                    Session()->pull('irms_feedback_tracking_number.'.$requestData['tracking_number']);
+                                }
+                            }
+
+                        } else {
+                            $this->message = 'This tracking number is not initiated';
+                            $this->status_code = HTTPResponse::HTTP_NOT_FOUND;
+                        }
+
+                    } else {
+                        $this->message = 'Invalid tracking number';
+                        $this->status_code = HTTPResponse::HTTP_NOT_FOUND;
+                    }
+
+                } else {
+                    $this->message = 'Tracking number or status not found from request';
+                    $this->status_code = HTTPResponse::HTTP_NOT_FOUND;
+                }
+
+            } else {
+                $this->message = 'Request could not be processed due to unauthorized ip or credentials';
+                $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+            }
+
+            $api_request_response->response_at = date("Y-m-d H:i:s");
+            $api_request_response->response_id = time() . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+
+            $responseEncode = $this->IrnDataResponse($this->message,  'BIDA-CALLBACK-RESPONSE', $api_request_response->response_id, $this->status_code);
+            $api_request_response->response_json = json_encode($responseEncode, JSON_UNESCAPED_UNICODE);
+
+            $api_request_response->save();
+
+            return response()->json($responseEncode);
+        } catch (\Exception $e) {
+            Log::error('callBack: ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . ' [IRMS-1015]');
+            return response()->json($this->IrnDataResponse('Sorry ! An internal error has occurred', 'BIDA-CALLBACK-RESPONSE', HTTPResponse::HTTP_INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    public function getUserInfo(Request $request)
+    {
+        $apache_request_headers = apache_request_headers();
+        $token = str_ireplace("bearer ", "", isset($apache_request_headers['Authorization']) ? $apache_request_headers['Authorization'] : '');
+
+        $user_email = trim($request->get('user_email'));
+
+        try {
+            // check whether bearer token exists in the request header
+            if (!empty($token)) {
+                $clientData = ClientOauthToken::leftJoin('client_master', 'client_master.id', '=', 'client_oauth_token.client_master_id')
+                    ->where(['client_oauth_token.oauth_token' => $token])
+                    ->first([
+                        'client_master.*',
+                        'client_oauth_token.id as client_oauth_token_id',
+                        'client_oauth_token.oauth_token_expire_at',
+                    ]);
+                    
+                // Client information check
+                if ($clientData) {
+                    // store request
+                    $api_response = new ModelsApiResponse();
+                    $api_response->body = json_encode($request->all());
+                    $api_response->api_id = $clientData->id;
+                    $api_response->endpoint = $request->fullUrl();
+                    $api_response->method = $request->method();
+                    $api_response->created_at = date("Y-m-d H:i:s");
+                    $api_response->save();
+                    
+                    // if token is not expire then do this
+                    if (date('Y-m-d H:i:s') < $clientData->oauth_token_expire_at) {
+                        // Check token validity
+                        $tokenService = new ApiTokenServiceJwt();
+
+                        //if the token no is valid then do next step
+                        if ($tokenService->checkTokenValidity($token, $clientData->encryption_key)) {
+                            // check whether Client IP/ URL is authorized to request
+                            $isAuthorizedClientUrl = isAuthorizedClientUrl($clientData);
+                            if ($isAuthorizedClientUrl['return_type'] === true) {
+                                // Email address is required.
+                                if (!empty($user_email)) {
+
+                                    $response_data = [];  
+                                    $response_data['data'] = $this->getUserInfoDataByEmail($user_email);
+                                    $this->response_data = $response_data;
+
+                                    $this->message = 'User Information send successfully';
+                                    $this->status_code = HTTPResponse::HTTP_OK;
+                                } else {
+                                    $this->message = 'Email Address not found from request';
+                                    $this->status_code = HTTPResponse::HTTP_BAD_REQUEST;
+                                }
+
+                            } else {
+                                $this->message = 'Request could not be processed due to unauthorized ip/url: ' . $isAuthorizedClientUrl['return_data'];
+                                $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+                            }
+
+                        } else {
+                            $this->message = 'Client Token is not valid';
+                            $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+                        }
+
+                    } else {
+                        $this->message = 'Client Token has been expired';
+                        $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+                    }
+
+                } else {
+                    $this->message = 'Token is not valid';
+                    $this->status_code = HTTPResponse::HTTP_UNAUTHORIZED;
+                }
+            } else {
+                $this->message = 'Token not found in request header';
+                $this->status_code = HTTPResponse::HTTP_BAD_REQUEST;
+            }
+            
+            $api_response->updated_at = date("Y-m-d H:i:s");
+            $api_response->response_id = time() . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            $api_response->response_status_code = $this->status_code;
+            $api_response->response_body = json_encode($this->response_data);
+            $api_response->save();
+            
+            $responseEncode = $this->IrmsDataResponse($this->message, 'BIDA-REQUEST-INITIATE', $this->status_code, $this->response_data, $api_response->response_id, $api_response->updated_at);
+            return response()->json($responseEncode);
+            // dd($this->response_data);
+        } catch (\Exception $e) {
+            Log::error('getUserInfo: ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . ' [IRMS-1013]');
+            return response()->json($this->IrmsDataResponse($this->message, 'BIDA-REQUEST-INITIATE', HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, $this->response_data, '', $api_response->updated_at));
+        }
+    }
+
+    
+    public function getUserInfoByEmail($user_email)
+    {
+        $userInfo = Users::where('users.user_email', $user_email)
+            ->join('user_types', 'users.user_type', '=', 'user_types.id')
+            ->first([
+                'users.id',
+                'users.company_ids',
+                'users.user_email',
+                'users.user_first_name',
+                'users.user_middle_name',
+                'users.user_last_name',
+                'users.user_DOB',
+                'users.user_phone',
+                'users.user_gender',
+                'users.nationality_id',
+                'users.nationality',
+                'users.nationality_type',
+                'users.user_type',
+                'user_types.type_name'
+            ]);
+
+            if(!empty($userInfo)){
+                $user_nationality = Countries::orderby('nationality')
+                ->where('id', $userInfo->nationality_id)
+                ->orWhere('iso', $userInfo->nationality)
+                ->pluck('nationality');
+    
+                $userInfo->nationality_name = $user_nationality;
+
+            } else {
+                $this->message = 'Email Address is not found';
+                $this->status_code = HTTPResponse::HTTP_BAD_REQUEST;
+            }
+        
+        return $userInfo;
+    }
+
+    public function getUserInfoDataByEmail($user_email)
+    {
+        $userInfo = $this->getUserInfoByEmail($user_email);
+
+        $data = [
+            "Name" => $userInfo->user_first_name.' '.trim($userInfo->user_middle_name).' '.$userInfo->user_last_name,
+            "Date of Birth" => date('d-M-Y', strtotime($userInfo->user_DOB)),
+            "Mobile Number" => $userInfo->user_phone,
+            "Email" => $userInfo->user_email,
+            "Gender" => $userInfo->user_gender,
+            "Nationality" => !empty($userInfo->nationality_name) ? $userInfo->nationality_name : '',
+            "Signup Type" => !empty($userInfo->nationality_type) ? $userInfo->nationality_type : '',
+            "User Type" => $userInfo->type_name,
+            "User Type Code" => $userInfo->user_type,
+        ];
+
+        return $data;
+    }
+
+
+
+    public static function IrnDataResponse($message = '', $responseType = '', $responseID = '', $status_code = HttpResponse::HTTP_BAD_REQUEST) {
+        $response['response'] = [
+            'responseTime' => time(),
+            'responseType'=> $responseType,
+            'responseID' => $responseID,
+            'responseCode' => $status_code,
+            'message' => $message
+        ];
+
+        return $response;
+    }
+
+    public static function IrmsDataResponse($message = '', $response_type = 'BIDA-REQUEST-INITIATE', $status_code = HttpResponse::HTTP_BAD_REQUEST, $data = '', $response_id, $response_at)
+    {
+        $stamp = strtotime($response_at); // get unix timestamp
+        $time_in_ms = $stamp * 1000;
+        $response['response'] = [
+            'responseTime' => $time_in_ms,
+            'responseType' => $response_type,
+            'responseID' => $response_id,
+            'responseCode' => $status_code,
+            'responseData' => $data,
+            'message' => $message
+        ];
+
+        return $response;
+    }
+}

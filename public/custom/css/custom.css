@@ -1,0 +1,843 @@
+/*google font Roboto*/
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+#reg_form .form-control-feedback {
+    top: 9px !important;
+}
+
+.user-login-modal-container {
+    /*font-family: 'Open Sans', sans-serif;*/
+    width: 422px;
+    margin-top: 81px;
+}
+
+.user-login-modal-title {
+    background-color: #fff;
+    text-align: left;
+    font-size: 18px;
+    font-weight: normal;
+    min-height: 24px;
+    line-height: normal;
+    padding: 20px 32px;
+    margin: 0;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    flex-shrink: 0;
+}
+
+.user-login-modal-container .user-login-modal-title .modal-title {
+    font-weight: normal;
+}
+
+.user-login-modal-container .user-login-modal-content {
+    background: #f6f9fc none repeat scroll 0 0;
+    font-size: 13px;
+    line-height: 1.8em;
+    max-height: 60vh;
+    overflow: auto;
+}
+
+.user-login-modal-content input {
+    font-size: 16px;
+}
+
+.user-login-modal-footer {
+    border-top: none;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    background: #f6f9fc none repeat scroll 0 0;
+    padding: 3px !important;
+}
+
+.login-need-help a {
+    display: block;
+    margin-bottom: 4px;
+    color: #337ab7;
+    text-decoration: none;
+}
+
+.nav > li > a.active {
+    text-decoration: none;
+    background-color: #3aa8d8;
+    color: #012233;
+}
+
+.nav > li > ul > li > a.active {
+    text-decoration: none;
+    background-color: #3aa8d8;
+    color: #012233;
+}
+
+.navbar-top-links li a.dropdown-toggle {
+    background-color: rgba(58, 168, 216, 0.5);
+    color: #012233;
+    border-radius: 3px;
+}
+
+.nav > li > a:hover,
+.nav > li > a:focus {
+    text-decoration: none;
+    background-color: #3aa8d8;
+}
+
+.nav .open > a,
+.nav .open > a:hover,
+.nav .open > a:focus {
+    background-color: #3aa8d8;
+    border-color: #337ab7;
+}
+
+.email-error-message {
+    color: #e82110;
+    font-size: 12px;
+}
+
+.password-error-message {
+    color: #e82110;
+    font-size: 12px;
+}
+
+.error {
+    color: #2a2727 !important;
+    border: 1px solid #e68880;
+}
+
+#otp_login_label {
+    font-size: 16px;
+}
+
+.search_div {
+    position: absolute;
+    right: 44px !important;
+    top: 4px;
+    border: 0px;
+    height: auto !important;
+    margin: 0 !important;
+    background-color: rgba(0, 0, 0, 0);
+    padding: 0;
+    box-shadow: none;
+}
+
+
+/*Style By Samad*/
+textarea {
+    resize: vertical;
+}
+
+
+/*----------------------------------------
+Footer page design
+------------------------------------------ */
+
+#footer_top {
+    /*background-color: rgba(230, 246, 253, 1);*/
+    background: #006A4E;
+    padding: 30px 0 15px 0;
+    color: #fff;
+}
+
+
+
+.footer_top_3rd {
+    text-align: right;
+}
+
+#footer_bottom {
+    /*background-color: rgba(230, 246, 253, 1);*/
+    background: #F42A41;
+    color: #fff;
+}
+
+.footer_menu {
+
+}
+.footer_menu ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.footer_menu ul li {
+    margin-bottom: 5px;
+}
+.footer_menu ul li a {}
+.footer_menu ul li a:hover {}
+
+
+
+/*----------------------------------------
+Home page articles design
+------------------------------------------ */
+
+.agency_details {
+    margin: 0px;
+    padding: 10px;
+    list-style: none;
+}
+
+/*down-up arrow*/
+.down_up_arrow::after {
+    font-family: "FontAwesome";
+    content: "\f107";
+    float: right;
+    transition: all 1s
+}
+
+.down_up_arrow[aria-expanded="true"]::after {
+    content: "\f106";
+}
+/*down-up arrow*/
+#available_service_click a{
+    display: block;
+}
+#ipa_agency a{
+    display: block;
+}
+#cap_agency a{
+    display: block;
+}
+
+
+.company-info {
+    color: #000;
+    padding: 15px;
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.company-info a {
+    color: #2E4053;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.less-padding {
+    padding: 1px;
+    margin: 0px !important;
+    border-color: #bfe4f0;
+}
+
+legend {
+    margin-bottom: 5px;
+}
+
+fieldset.scheduler-border {
+    border: 1px solid #a49f9f !important;
+    /*padding: 0 1.1em 0.2em 1.1em !important;*/
+    padding: 0.35em 0.75em !important;
+    margin: 0 0 1.5em 0 !important;
+    -webkit-box-shadow: 0px 0px 0px 0px #000;
+    box-shadow: 0px 0px 0px 0px #000;
+}
+
+legend.scheduler-border {
+    font-size: 1.2em !important;
+    font-weight: bold !important;
+    text-align: left !important;
+    width: auto;
+    /*padding:0 10px;*/
+    padding: 0 2px;
+    border-bottom: none;
+}
+
+.breadcrumb {
+    background-color: #e9ecef;
+}
+
+form label,
+form .table > thead:first-child > tr:first-child > th,
+form .table > tbody > tr > td {
+    font-weight: normal;
+    font-size: 15px;
+}
+
+form .table > thead:first-child > tr:first-child > th {
+    font-weight: bold;
+}
+
+label.text-success,
+label.text-info,
+label.text-warning,
+label.text-danger,
+label.text-primary {
+    font-weight: bold;
+}
+
+.table.borderless > tbody > tr > td,
+.table.borderless > tbody > th > td {
+    border: none;
+}
+
+.welcome_label {
+    display: block;
+    margin-bottom: 0;
+    border-radius: 4px 4px 0 0;
+}
+
+.welcome_label h2 {
+    margin: 5px 0;
+    white-space: normal;
+    font-size: 14px;
+}
+
+.login-cred-btn {
+    border-radius: 0;
+}
+
+#home_button {
+    margin-bottom: 10px;
+}
+
+#home_button .btn {
+    border-radius: 0;
+    white-space: normal;
+    text-align: left;
+}
+
+#home_button .btn i {
+    float: left;
+    background: #fff;
+    color: #000;
+    /* padding: 15px; */
+    border-radius: 50%;
+    width: 50px;
+    line-height: 50px;
+    height: 50px;
+    text-align: center;
+    margin-right: 15px;
+    font-size: 30px;
+}
+
+#home_button .btn span {
+
+}
+
+/*#homeTabs .btn{*/
+/*border-radius: 0;*/
+/*}*/
+/*#homeTabs .btn.active{*/
+/*border-radius: 0;*/
+/*}*/
+.nav-tabs.nav-justified.homeTabs {
+    border: 0;
+}
+
+.nav-tabs.nav-justified.homeTabs > li > a {
+    border: 0;
+    font-size: 16px;
+    border-radius: 0;
+    transition: all 0.3s ease-in;
+}
+
+.nav-tabs.homeTabs > li.active > a,
+.nav-tabs.homeTabs > li.active > a:hover,
+.nav-tabs.homeTabs > li.active > a:focus {
+    border: 0;
+    color: #fff;
+    /*background-color: #286090 !important;*/
+    background-color: #921841 !important;
+}
+
+.nav-tabs.nav-justified.homeTabs > li > a:hover,
+.nav-tabs.nav-justified.homeTabs > li > a:focus {
+    background-color: #921841 !important;
+}
+
+.nav-tabs.nav-justified.homeTabs > .active > a,
+.nav-tabs.nav-justified.homeTabs > .active > a:hover,
+.nav-tabs.nav-justified.homeTabs > .active > a:focus {
+    /*color: #fff;*/
+    /*cursor: default;*/
+    /*background-color: #fff;*/
+    /*border: 0;*/
+    font-weight: bold;
+}
+
+/* Hiding the checkbox, but allowing it to be focused */
+.badgebox {
+    opacity: 0;
+}
+
+.badgebox + .badge {
+    /* Move the check mark away when unchecked */
+    text-indent: -999999px !important;
+    /* Makes the badge's width stay the same checked and unchecked */
+    width: 27px;
+    border: 2px solid #5bc0de; /* btn-info*/
+    /*border: 2px solid #5cb85c; !* btn-success*!*/
+    /*float: right;*/
+    margin: 3px 0px 0px 5px;
+}
+
+.badgebox:focus + .badge {
+    /* Set something to make the badge looks focused */
+    /* This really depends on the application, in my case it was: */
+
+    /* Adding a light border */
+    box-shadow: inset 0px 0px 5px;
+    /* Taking the difference out of the padding */
+}
+
+.badgebox:checked + .badge {
+    /* Move the check mark back when checked */
+    text-indent: 0 !important;
+}
+
+.btn-outline {
+    border: 2px solid;
+}
+
+.btn-outline.disabled {
+    background: transparent;
+}
+
+
+.box-div {
+    background: #d8eff7 none repeat scroll 0 0;
+    border-radius: 0 0 4px 4px;
+    padding: 10px;
+    border: 1px solid #bce8f1;
+    margin-bottom: 10px;
+}
+
+.box-div-img {
+    /*background: url('/assets/images/imagesL.jpg') no-repeat scroll 0 0;*/
+    /*background-size: cover;*/
+}
+
+.homeSlider {
+    margin-bottom: 10px;
+}
+
+.alert {
+    overflow: hidden;
+}
+
+thead > tr > th {
+    padding: 6px !important;
+}
+
+.table.table-bordered.dataTable {
+    border-collapse: collapse !important;
+}
+
+.table.dataTable > thead > tr {
+    background-color: #fff !important;
+    color: #000 !important;
+}
+
+.table.dataTable thead .sorting:after {
+    color: #999 !important;
+    opacity: 0.7 !important;
+}
+
+.sidefooter {
+    display: none;
+}
+
+html, body {
+    font-family: 'Roboto', sans-serif, Arial !important;
+    font-size: 14px;
+    background-color: #fff;
+}
+
+@media only screen and (min-width: 768px) {
+    #page-wrapper {
+        margin: 0 0 0 250px;
+        padding-top: 10px;
+    }
+
+    .sidebar {
+        margin-top: 56px;
+    }
+
+    /*.sticky-footer{*/
+    /*margin: 7px 0 0 250px;*/
+    /*}*/
+
+}
+
+@media only screen and (max-width: 767px) {
+    #page-wrapper {
+        padding-top: 10px;
+    }
+
+    .footer_top_3rd {
+        text-align: left;
+    }
+
+    .nav-logo {
+        text-align: center;
+    }
+
+    .nav-toggle {
+        float: right;
+    }
+
+    .navbar-top-links {
+        background: #bee4f1;
+        text-align: center;
+    }
+
+    .navbar-top-links .dropdown-alerts {
+        margin-left: 0px;
+    }
+    .search_div {
+        top: initial;
+    }
+}
+
+@media screen and (max-width: 952px) and (min-width: 768px) {
+    .header-caption {
+        max-width: 250px;
+        font-size: 16px;
+        line-height: 26px;
+    }
+}
+
+
+.cursor {
+    cursor: pointer;
+}
+
+.color-class {
+    color: #101667;
+}
+
+.button-color {
+    color: white;
+}
+
+.hover-item:hover {
+    background: #ddd;
+}
+
+/*a:visited:hover,*/
+/*a:visited:focus,*/
+/*a:visited:active {*/
+/*color:#fff;*/
+/*background:#730800;*/
+/*}*/
+.triangle-right {
+    position: relative;
+    padding: 15px;
+    margin: 1em 0 3em;
+    color: #fff;
+    background: #075698; /* default background for browsers without gradient support */
+    /* css3 */
+    background: -webkit-gradient(linear, 0 0, 0 100%, from(#2e88c4), to(#075698));
+    background: -moz-linear-gradient(#2e88c4, #075698);
+    background: -o-linear-gradient(#2e88c4, #075698);
+    background: linear-gradient(#2e88c4, #075698);
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+/* Variant : for top positioned triangle
+------------------------------------------ */
+
+.triangle-right.top {
+    background: -webkit-gradient(linear, 0 0, 0 100%, from(#075698), to(#2e88c4));
+    background: -moz-linear-gradient(#075698, #2e88c4);
+    background: -o-linear-gradient(#075698, #2e88c4);
+    background: linear-gradient(#075698, #2e88c4);
+}
+
+.triangle-right:after {
+    content: "";
+    position: absolute;
+    bottom: -20px; /* value = - border-top-width - border-bottom-width */
+    left: 50px; /* controls horizontal position */
+    border-width: 20px 0 0 20px; /* vary these values to change the angle of the vertex */
+    border-style: solid;
+    border-color: #075698 transparent;
+    /* reduce the damage in FF3.0 */
+    display: block;
+    width: 0;
+}
+
+/* Variant : top
+------------------------------------------ */
+
+.triangle-right.top:after {
+    top: -20px; /* value = - border-top-width - border-bottom-width */
+    right: 50px; /* controls horizontal position */
+    bottom: auto;
+    left: auto;
+    border-width: 20px 20px 0 0; /* vary these values to change the angle of the vertex */
+    border-color: transparent #075698;
+}
+
+/* Variant : left
+------------------------------------------ */
+
+/* For Feedback Message 
+----------------------------------- */
+
+
+.circular-sb {
+    width: 280px;
+    border: 5px solid orange;
+    padding: 15px 20px;
+    margin: 30px auto;
+    border-radius: 45%;
+    font-size: 24px;
+    font-weight: 900;
+    /*font-family: arial;*/
+    position: absolute;
+    color: black;
+    display: inline-block;
+    z-index: 1;
+    margin-left: 300px;
+    margin-top: 6px;
+    float: left;
+    background: white;
+
+}
+
+
+.circle1 {
+    border: 5px solid orange;
+    position: absolute;
+    width: 25px;
+    padding: 20px;
+    border-radius: 48%;
+    left: -36px;
+    bottom: 23px;
+    z-index: 1;
+
+}
+
+.circle1:before {
+    content: "";
+    position: absolute;
+    width: 25px;
+    padding: 20px;
+    border-radius: 50%;
+    left: 0px;
+    bottom: 0px;
+    background: #fff;
+    z-index: 1;
+
+}
+
+
+.circle2 {
+    border: 5px solid orange;
+    position: absolute;
+    width: 3px;
+    padding: 8px 13px;
+    border-radius: 50%;
+    left: -60px;
+    bottom: 5px;
+    z-index: 1;
+
+}
+
+
+#container {
+    width: 300px;
+    /*padding:0 0 100px;*/
+    margin: 0 auto;
+    margin-right: 200px;
+}
+
+.content h2 {
+    margin: 2em 0 0.75em;
+    font-size: 2em;
+    font-weight: bold;
+    font-style: normal;
+    text-align: left;
+}
+
+blockquote {
+    margin: 1em 0;
+}
+
+blockquote p {
+    margin: 0;
+    font-size: 2em;
+}
+
+.oval-thought-border {
+    position: relative;
+    /*padding:30px 0px;*/
+    margin: 1em auto 50px;
+    border: 7px solid orange;
+    text-align: center;
+    color: #333;
+    background: #fff;
+    /* css3 */
+    /*
+    NOTES:
+    -webkit-border-radius:240px 140px; // produces oval in safari 4 and chrome 4
+    -webkit-border-radius:240px / 140px; // produces oval in chrome 4 (again!) but not supported in safari 4
+    Not correct application of the current spec, therefore, using longhand to avoid future problems with webkit corrects this
+    */
+    -webkit-border-top-left-radius: 240px 140px;
+    -webkit-border-top-right-radius: 240px 140px;
+    -webkit-border-bottom-right-radius: 240px 140px;
+    -webkit-border-bottom-left-radius: 240px 140px;
+    -moz-border-radius: 240px / 140px;
+    border-radius: 240px / 140px;
+}
+
+/* creates the larger circle */
+.oval-thought-border:before {
+    content: "";
+    position: absolute;
+    z-index: 10;
+    bottom: -40px;
+    right: 100px;
+    width: 50px;
+    height: 50px;
+    border: 7px solid orange;
+    background: #fff;
+    /* css3 */
+    -webkit-border-radius: 50px;
+    -moz-border-radius: 50px;
+    border-radius: 50px;
+    /* reduce the damage in FF3.0 */
+    display: block;
+}
+
+/* creates the smaller circle */
+.oval-thought-border:after {
+    content: "";
+    position: absolute;
+    z-index: 10;
+    bottom: -60px;
+    right: 50px;
+    width: 25px;
+    height: 25px;
+    border: 7px solid orange;
+    background: #fff;
+    /* css3 */
+    -webkit-border-radius: 25px;
+    -moz-border-radius: 25px;
+    border-radius: 25px;
+    /* reduce the damage in FF3.0 */
+    display: block;
+}
+
+.top-buffer {
+    margin-top: 2px;
+}
+
+.left-buffer {
+    padding-left: 1px;
+}
+
+.right-buffer {
+    padding-right: 1px;
+}
+
+.txt-style {
+    /*font-family: 'Arial';*/
+    font-weight: 400;
+    font-style: normal;
+    color: #fff;
+    font-size: 100%;
+}
+
+.btn-green {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    line-height: 1.42857143;
+    white-space: nowrap;
+    vertical-align: middle;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #161616;
+    border-color: rgba(0, 153, 102, 1) !important;
+    text-align: left;
+}
+
+.licence_logo {
+    padding-right: 5px;
+}
+
+.licence_logo img {
+    width: 28px !important;
+    height: auto;
+}
+
+.btn-green:hover {
+    color: #fff;
+    background-color: rgba(95, 181, 230, 1);
+    border-color: rgba(95, 181, 230, 1);
+}
+
+.verified_icon {
+    background-color: rgba(0, 153, 51, 1);
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: #fff;
+    font-weight: bold;
+    position: relative;
+    top: 6px;
+}
+
+p.licence_entity {
+    margin-top: 5px;
+    margin-left: 8px;
+    margin-bottom: 5px;
+}
+
+p.licence_name {
+    margin-top: 5px;
+    margin-left: 3px;
+    margin-bottom: 5px;
+}
+
+.licence_apply {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.heading_img img {
+    width: 50px !important;
+    height: auto;
+    margin-right: 10px;
+}
+
+.heading_text {
+    font-size: 23px;
+    margin-top: 4px;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+/* End Feedback css style
+------------------------- */
+
+.custom-err-msg {
+    color: red;
+    margin-top: 250px;
+    text-align: center;
+}
+
+.btn-center {
+    text-align: center;
+}
+
+
+/*
+Date time picker style
+ */
+.table-datetime td {
+    padding: 3px 4px;
+    border: 1px solid #d7e5f2;
+}
+
+.panel-info {
+    border-color: #a0d5ef !important;
+}
+
+/*
+View page label design
+ */
+.v_label {
+    color: #4e7aa2;
+}

@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;700&display=swap"
+          rel="stylesheet"> -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://eporcha.gov.bd/css/graph.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://eporcha.gov.bd/css/datatable.css">
+    <link href="https://fonts.maateen.me/solaiman-lipi/font.css" rel="stylesheet">
+
+        <meta name="csrf-token" content="9iDMxC8P41dkhcKZe02uSf1yjCnLOiIfPp1auMmG">
+    <title>নির্দেশিকা</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+        <style>
+        .guideline_header_outer {
+            background: #42A045;
+            width: 100%;
+            height: auto;
+            color: white;
+        }
+
+        .guideline_header_inner {
+            text-align: center;
+            padding: 2rem 0rem 4rem 0rem;
+        }
+
+        .guideline_header_inner .title {
+            font-weight: 700;
+            font-size: 30px;
+        }
+
+        .guideline_content_outer {
+            background-color: #F5F6FA;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .guideline_content_inner{
+            position: relative;
+            top: -60px;
+            background-color: #FFFFFF;
+            width: 80%;
+            margin: 10px 0px;
+            box-shadow: 0px 30px 60px rgb(26 47 4 / 7%);
+            border-radius: 20px;
+        }
+
+        .guideline_tab{
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-pills{
+            border: 2px solid;
+            border-radius: 10px;
+        }
+
+        .nav-pills .nav-link:first-child {
+            padding: .8rem;
+            border-radius: 0;
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+            color: white!important;
+        }
+
+        .nav-pills .right-btn{
+            padding: .8rem!important;
+            border-radius: 0!important;
+            border-top-right-radius: 6px!important;
+            border-bottom-right-radius: 6px!important;
+            color: white!important;
+        }
+
+        .nav-pills .nav-link.active, .nav-pills .show>.nav-link{
+            background-color: #ffffff;
+            color: #42A045!important;
+        }
+
+        .guideline_content_title{
+            color: #42A045;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+        }
+
+        .guideline_content_title p:last-child{
+            font-size: 1.1rem;
+        }
+
+        .guideline_content_number{
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            background-color: rgba(66, 160, 69, 0.1);
+            align-items: center;
+            display: flex;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .guideline_title .title{
+            color: #42A045;
+            font-size: 30px;
+            font-weight: 700;
+        }
+
+        .guideline_title p{
+            font-weight: 400;
+            font-size: 15px;
+            line-height: 23px;
+        }
+
+        .nav-item button{
+            font-size: 12px;
+        }
+
+        .guideline_description p{
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 26px;
+        }
+
+        .guideline_content_text{
+            font-weight: 700;
+            font-size: 16px;
+            line-height: 26px;
+        }
+
+        .guideline_content_description{
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 26px;
+        }
+
+        /*new css added*/
+        .video-list {
+            height: 400px;
+            padding: 10px;
+        }
+
+        .video-list ul {
+            padding-left: 0px;
+        }
+
+        #video-list-items li{
+            position: relative;
+        }
+
+        #video-list-items .video-title{
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        #video-list-items .video-title span{
+            position: absolute;
+            top: 1em;
+            left: 1.5em;
+            background-color: rgb(255, 255, 255);
+            border-radius: 0.3em;
+            color: rgb(0, 0, 0);
+            font-size: 13px;
+            font-weight: bold;
+            padding: 0.2em 0.8em;
+        }
+    </style>
+    <style>
+        :root {
+            --green-bg-color: linear-gradient(180deg, #9CCC3C 10.84%, #25B771 100%);
+            --orange-bg-color: linear-gradient(180deg, #FE8600 10.84%, #F9450B 100%);
+            --pink-bg-color:linear-gradient(180deg, #FC598E 10.84%, #C8044C 100%);
+            --violet-bg-color:linear-gradient(180deg, #A178FF 10.84%, #4B408C 100%);
+            --blue-bg-color:linear-gradient(180deg, #5697FF 10.84%, #0B63ED 100%);
+        }
+
+        *{
+            margin: 0;
+            padding: 0;
+            outline: 0;
+        }
+
+        @font-face {
+            font-family: "Nikosh";
+            src: "https://eporcha.gov.bd/fonts/Nikosh.ttf" format("truetype");
+        }
+
+        @font-face {
+            font-family: 'Kalpurush';
+            src: "https://eporcha.gov.bd/fonts/kalpurush.ttf" format("truetype");;
+        }
+
+        body{
+            font-family: "SolaimanLipi";
+        }
+
+        html{
+            font-size:17px;
+        }
+
+        .section-container {
+            width: 95%;
+            margin: 45px auto;
+            margin: 0 auto;
+            margin-top: 54px;
+        }
+        /* navbar css start */
+        .navbar{
+            border:none;
+            background: #ffffff;
+            box-shadow:none;
+        }
+
+        .nav img{
+            height: 15px;
+            margin-right: 5px;
+        }
+
+        .nav-link{
+            display: flex;
+            align-items: center;
+            color: black!important;
+        }
+        /* footer css start*/
+
+        .footer {
+            background: #FFF;
+            padding: 28px 0px;
+        }
+
+        .footer-contents {
+            padding: 10px 15px;
+        }
+        .footer-content{
+            display:flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer-contents h2 {
+            font-size: 15px;
+            color: #000000;
+            text-align: center;
+            font-weight: 600;
+            padding-bottom: 7px;
+        }
+
+        .footer-contents ul{
+            list-style-type: none;
+        }
+
+        .footer-contents ul li{
+            display: block;
+            text-align: start;
+        }
+
+        .footer-contents ul li a{
+            color: #92278F;
+            font-weight: 600;
+        }
+
+        .social-icons {
+            height: 35px;
+            width: 35px;
+            display: inline-block;
+            background-color: #fff;
+            text-align: center;
+            border-radius: 50%;
+            font-size: 20px;
+            line-height: 34px;
+        }
+
+        .facebook{
+            background-color: #3b5998;
+            color: #fff;
+        }
+
+        .youtube {
+            background-color: #ff0000;
+            color: #fff;
+        }
+
+        .facebook:hover,
+        .youtube:hover{
+            background-color: #099f19;
+            color: #fff;
+        }
+
+        .footer-bottom{
+            background: #42A045;
+            line-height: 20px;
+            padding: 14px 0px 2px;
+            text-align: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .footer-bottom p{
+            font-style: normal;
+            font-weight: 400;
+            font-size: 17px;
+        }
+
+        .error{
+            color: red;
+        }
+
+
+        @media (min-width: 1000px){
+            .section-container {
+                max-width: 940px;
+            }
+        }
+         @media (min-width: 1200px){
+            .section-container {
+                max-width: 1140px;
+            }
+
+        }
+
+        @media (min-width: 992px) {
+            .navbar-expand-lg .navbar-collapse{
+                justify-content: end!important;
+            }
+        }
+
+        @media  screen and (max-width: 1200px) and (min-width: 993px) {
+            .helpline .box-arrow{
+                left: 96%;
+            }
+        }
+        @media  screen and (min-width: 1400px) {
+            .section-container {
+                max-width: 1320px;
+
+            }
+            .contianer-header{
+                max-width:1320px;
+            }
+            .ui-contianer{
+                width: 1320px;
+            }
+        }
+
+        @media  screen and (max-width: 992px) and (min-width: 576px) {
+            .helpline .box-arrow{
+                left: 78%;
+            }
+        }
+
+        @media  screen and (max-width: 800px) {
+            html{
+                font-size:12px;
+            }
+
+        }
+        @media (max-width: 576px) {
+            .helpline .box-arrow{
+                left: 70%;
+            }
+
+            .helpline-column{
+                display: flex;
+                justify-content: center;
+            }
+            .helpline .box-arrow{
+                left: 76%;
+            }
+
+            .container{
+                margin: 0 10px;
+                width: calc(100% - 20px);
+            }
+        }
+
+    </style>
+    </head>
+<body>
+<style>
+    .dropdown_item{
+        padding: 6px 22px 4px 10px;
+        border-bottom: 1px solid #80808066;
+    }
+
+    .dropdown_item a{
+        color: #000;
+        text-decoration: none;
+    }
+    .dropdown_item i{
+        color: #286e2a;
+        padding-right: 6px;
+    }
+    .dropdown_item:last-child{
+        border-bottom:none;
+    }
+    .dropdown_item .logout_button{
+        color: white;
+        font-size: 1rem;
+        background: #ac0303;
+        margin-left: auto;
+    }
+
+    .nav-link svg{
+        margin-right:5px;
+    }
+
+    .navbar{
+        padding-top: 0;
+        padding-bottom:0;
+    }
+
+    .nav-item{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-item.active{
+        border-bottom: 2px solid #42A045;
+        border-radius: 2px;
+    }
+
+    .nav-item.active> .nav-link{
+        color: #42A045!important;
+    }
+
+    .navbar-brand{
+        padding-bottom:0;
+    }
+    .navbar-cls{
+        max-width:180px;
+    }
+    /* .navbar-length{
+        width:1000px;
+    } */
+
+    @media (max-width: 1000px) {
+        .navbar-nav .dropdown-menu{
+            position: absolute;
+            right: auto;
+            left: auto;
+        }
+        .navbar-collapse{
+            border-top: 1.5px solid #d1d1d1;
+            padding-top: 4px;
+        }
+    }
+    @media (max-width: 650px) {
+        .navbar-cls{
+            max-width:140px;
+        }
+    }
+</style>
+
+
+
+<nav class="container navbar navbar-expand-lg navbar-light navbar-length" >
+    
+
+            <a class="navbar-brand navbar-cls"  href="https://eporcha.gov.bd">
+           
+        </a>
+    
+    <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+    >
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+</nav>
+    <main>
+        <div class="guideline_header_outer">
+            <div class="guideline_header_inner container">
+                <h3 class="title">নির্দেশিকা</h3>
+                
+            </div>
+        </div>
+
+        <div class="guideline_content_outer">
+            <div class="guideline_content_inner p-4 container">
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                        <div class="guideline_title text-center">
+                            <h3 class="title">অনলাইনে খতিয়ান ও মৌজা ম্যাপ গ্রহণের পদ্ধতি</h3>
+                        </div>
+                        <div class="guideline_content mx-2">
+                            <div class="guideline_content_box">
+                                <div class="guideline_content_title mb-2">
+                                    <p class="guideline_content_number">১</p>
+                                    <p class="mx-3 guideline_content_text">পোর্টাল ভিজিট</p>
+                                </div>
+                                <p class="guideline_content_description">
+                                    যে কোন ব্রাউজারের এড্রেসবারে https://www.eporcha.gov.bd/ এড্রেসটি লিখে প্রবেশ করলে খতিয়ান ও মৌজা ম্যাপের সেবা গ্রহণের জন্য পোর্টাল পাওয়া যাবে। প্রয়োজনে পোর্টালে সংরক্ষিত ভিডিও টিউটোরিয়ালটি দেখে নিতে পারেন।
+                                </p>
+                            </div>
+                            <div class="guideline_content_box">
+                                <div class="guideline_content_title mb-2">
+                                    <p class="guideline_content_number">২</p>
+                                    <p class="mx-3 guideline_content_text">খতিয়ান ও ম্যাপ অনুসন্ধান</p>
+                                </div>
+                                <p class="guideline_content_description">
+                                    এরপর, পোর্টালে প্রয়োজনীয় সেবা গ্রহণের জন্য "সার্ভে খতিয়ান/নামজারি খতিয়ান/মৌজা ম্যাপ" মেনুতে ক্লিক করে নিম্নে কাঙ্খিত খতিয়ান/মৌজা ম্যাপের প্রয়োজনীয় তথ্য (বিভাগ, জেলা, উপজেলা, খতিয়ানের ধরন, মৌজা) দিয়ে  খতিয়ানটি পাওয়া যাবে। সার্ভে খতিয়ানের ক্ষেত্রে উক্ত খতিয়ানের উপর ডাবল ক্লিক করলে খতিয়ানের হাল-সাবেক দাগ ও বিস্তারিত দেখার এবং আবেদন করার অপশন থাকবে। নামজারি খতিয়ানের ক্ষেত্রে উক্ত খতিয়ানের সাথে আগত খতিয়ানের লিংক দেখা যাবে। খতিয়ান/ম্যাপ আবেদনের জন্য “খতিয়ান/মৌজা ম্যাপ আবেদন ফর্ম” পূরণ করে সরকার নির্ধারিত আবেদন ফি (অনলাইন/সার্টিফাইড কপি)পরিশোধ করার সুযোগ পাবেন।
+                                </p>
+                            </div>
+                            <div class="guideline_content_box">
+                                <div class="guideline_content_title mb-2">
+                                    <p class="guideline_content_number">৩</p>
+                                    <p class="mx-3 guideline_content_text">অনুরোধকৃত আবেদন</p>
+                                </div>
+                                <p class="guideline_content_description">
+                                    খতিয়ান অনুসন্ধান করে না পাওয়া গেলে, খতিয়ান নম্বর দিয়ে  অনুসন্ধান  করে আবেদন করুন।
+                                </p>
+                            </div>
+                            <div class="guideline_content_box">
+                                <div class="guideline_content_title mb-2">
+                                    <p class="guideline_content_number">৪</p>
+                                    <p class="mx-3 guideline_content_text">সার্টিফাইড কপি</p>
+                                </div>
+                                <p class="guideline_content_description">
+                                    সার্টিফাইড কপি ডেলিভারির জন্য “অফিস কাউনটার/ডাকযোগ” নির্ধারণ করে দিতে হবে। দেশের অভ্যন্তরে ও বাইরে খতিয়ান ডেলিভারি নেওয়া যাবে। খতিয়ান/মৌজা ম্যাপ আবেদন ফর্মে যে ঠিকানা দেওয়া হবে খতিয়ান/মৌজা ম্যাপ সেই ঠিকানায় ডেলিভারি হবে।
+                                </p>
+                            </div>
+                            <div class="guideline_content_box">
+                                <div class="guideline_content_title mb-2">
+                                    <p class="guideline_content_number">৫</p>
+                                    <p class="mx-3 guideline_content_text">ফি পরিশোধ</p>
+                                </div>
+                                <p class="guideline_content_description">
+                                    সব কিছু ঠিক থাকলে খাতিয়ান/মৌজা ম্যাপ আবেদনটি প্রিন্ট করে রাখতে পারেন। এপর্যায়ে, সরকার নির্ধারিত ফি পরিশোধ করার পর উক্ত খতিয়ান/মৌজা ম্যাপ আবেদনের নম্বরটি ও সম্ভাব্য ডেলিভারি তারিখ আবেদনে প্রদত্ত মোবাইলে এসএমএস এর মাধ্যমে প্রেরণ করা হবে।
+                                </p>
+                            </div>
+                            <div class="guideline_content_box">
+                                <div class="guideline_content_title mb-2">
+                                    <p class="guideline_content_number">৬</p>
+                                    <p class="mx-3 guideline_content_text">আবেদনের অবস্থা</p>
+                                </div>
+                                <p class="guideline_content_description">
+                                    আবেদনকারী আবেদন করার পর যেকোন পর্যায়ে ডিজিটাল ল্যান্ড রেকর্ড পোর্টালে "আবেদনের অবস্থা" বাটনে ক্লিক করে আবেদনের সর্বশেষ অবস্থান দেখতে পারবেন।
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+<div class="footer-bottom">
+    <p>কপিরাইট @২০২৪ ভূমি মন্ত্রণালয়।</p>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<!-- <script src="https://eporcha.gov.bd/emutation_resources/js/custom.js"></script> -->
+<script src="https://gw.alipayobjects.com/os/lib/antv/g6/3.7.1/dist/g6.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/load-css-file@1.0.0/index.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js" charset="utf-8"></script>
+<script src="https://eporcha.gov.bd/js/newGraph_v2.js"></script>
+<!-- <script
+    src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"
+></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script type="text/javascript" src="https://eporcha.gov.bd/backend_resources/js/app.js"></script>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-slimScroll/1.3.8/jquery.slimscroll.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.video-list').slimScroll({
+                height: '400px'
+            });
+
+            $('#video-list-items').on('click', '.video-title', function () {
+                let videoUrl = $(this).closest('li').find('video').data('video-url');
+
+                $('#video-player').attr('src', videoUrl);
+                $('#video-player')[0].play();
+            });
+        });
+    </script>
+    <script>
+    jQuery.extend(jQuery.validator.messages, {
+        required: "এই তথ্যটি অবশ্যক।",
+        remote: "Please fix this field.",
+        email: "Please enter a valid email address.",
+        url: "Please enter a valid URL.",
+        date: "Please enter a valid date.",
+        dateISO: "Please enter a valid date (ISO).",
+        number: "Please enter a valid number.",
+        digits: "Please enter only digits.",
+        creditcard: "Please enter a valid credit card number.",
+        equalTo: "সঠিক যোগফল লিখুন",
+        accept: "Please enter a value with a valid extension.",
+        maxlength: jQuery.validator.format("Please enter no more than {0} characters."),
+        minlength: jQuery.validator.format("Please enter at least {0} characters."),
+        rangelength: jQuery.validator.format("Please enter a value between {0} and {1} characters long."),
+        range: jQuery.validator.format("Please enter a value between {0} and {1}."),
+        max: jQuery.validator.format("Please enter a value less than or equal to {0}."),
+        min: jQuery.validator.format("Please enter a value greater than or equal to {0}.")
+    });
+
+    
+    function bn2en(input) {
+        if(typeof input=='undefined') return '';
+        var numbers = {
+            '০': 0,
+            '১': 1,
+            '২': 2,
+            '৩': 3,
+            '৪': 4,
+            '৫': 5,
+            '৬': 6,
+            '৭': 7,
+            '৮': 8,
+            '৯': 9
+        };
+        var output = [];
+        for (var i = 0; i < input.length; i++) {
+            if (numbers.hasOwnProperty(input[i])) {
+                output.push(numbers[input[i]]);
+            } else {
+                output.push(input[i]);
+            }
+        }
+        return output.join('').toString();
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+
+
+table thead tr th{
+    border: 1px solid #080818;
+    border-bottom: 0px;
+    font-weight: normal;
+    font-size: 15px;
+
+}
+
+table tbody tr td{
+    border: 1px solid #080818;
+    font-size: 15px;
+}
+table tfoot tr td{
+    border: 1px solid #FFFFFF;
+    font-size: 15px;
+}
+
+table {
+    border-collapse: collapse;
+    font-size: 15px;
+    width: 100%;
+}
+
+table, th, td {
+    border: 1px solid black;
+    font-size: 15px;
+}
+

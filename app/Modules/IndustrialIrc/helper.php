@@ -1,0 +1,5 @@
+<?php
+
+/**
+ *	IndustrialIrc Helper  
+ */

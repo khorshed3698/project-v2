@@ -1,0 +1,649 @@
+/**
+ * Section Name: BIDA Public Service Performance Section
+ * Author: Hafizur Rahman
+ * Description: Description
+ * Version: 1.0.0
+ */
+.bida-pspd-sec{
+  overflow: hidden;
+}
+
+.bida-pspd-content{
+  position: relative;
+  width: 100%;
+}
+
+.oss-public-service-top{
+  position: relative;
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto 20px;
+}
+
+@media (min-width: 992px){
+  .oss-serv-menu{
+    position: relative;
+    height: 100%;
+    width: 100%;
+    min-height: 460px;
+    border: none !important;
+  }
+  .oss-public-service-top .oss-srv-center-text{
+    position: absolute;
+    height: 150px;
+    width: 300px;
+    border-radius: 50% 50% 0 0;
+    bottom: 0;
+    left: 50%;
+    margin-left: -150px;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="312" height="156" viewBox="0 0 312 156" fill="none"><path opacity="0.3" d="M311.545 155.937H303.145C303.145 74.6772 237.265 8.79724 156.005 8.79724C74.7449 8.79724 8.86484 74.6772 8.86484 155.937H0.464844C0.464844 70.0272 70.0948 0.397217 156.005 0.397217C241.915 0.397217 311.545 70.0272 311.545 155.937Z" fill="%231F1E21"/></svg>');
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-size: 100%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px 20px 0;
+  }
+  .oss-public-service-top .oss-srv-center-text span{
+    font-size: 30px;
+    line-height: 1;
+    font-weight: bold;
+  }
+  .oss-serv-menu .oss-serv-menu-item{
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+    position: absolute;
+    display: block;
+    background-color: transparent !important;
+    border: none !important;
+  }
+
+  .oss-serv-menu .oss-serv-menu-item .srv-menu-text{
+    position: relative;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #ffffff;
+    font-size: 17px;
+    line-height: 1.2;
+    font-weight: 300;
+    letter-spacing: 0.085px;
+  }
+
+  .oss-serv-menu .oss-serv-menu-item .ossServ-tabText-item{
+    background-color: transparent !important;
+    border: none !important;
+    height: 120px;
+    width: 240px;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 50px;
+    cursor: pointer;
+    z-index: 100;
+  }
+
+  .oss-serv-menu.activeTabMenuContainer .oss-serv-menu-item .ossServ-tabText-item:hover .srv-menu-text,
+  .oss-serv-menu.activeTabMenuContainer .ossSrvTabActive .active .srv-menu-text{
+    color: #ffffff;
+  }
+  .oss-serv-menu.activeTabMenuContainer .oss-serv-menu-item .srv-menu-text{
+    color: #000;
+  }
+
+  .oss-serv-menu .srv-menu-01{
+    background-image: url(../../images/public-service/service-menu-bg-1.svg);
+    height: 227px;
+    width: 320px;
+    bottom: 0;
+    left: 0;
+  }
+  .oss-serv-menu.activeTabMenuContainer .srv-menu-01{
+    background-image: url(../../images/public-service/service-menu-bg-1-deactive.svg);
+  }
+  .oss-serv-menu .srv-menu-01.ossSrvTabActive{
+    background-image: url(../../images/public-service/service-menu-bg-1-hover.svg);
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-01 .ossServ-tabText-item{
+    transform: rotate(18deg);
+    bottom: 32px;
+    right: 40px;
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-01 .ossServ-tabText-item .srv-menu-text{
+    transform: rotate(-18deg);
+  }
+
+
+  .oss-serv-menu .srv-menu-02{
+    background-image: url(../../images/public-service/service-menu-bg-2.svg);
+    height: 294px;
+    width: 268px;
+    bottom: 85px;
+    left: 126px;
+  }
+  .oss-serv-menu.activeTabMenuContainer .srv-menu-02{
+    background-image: url(../../images/public-service/service-menu-bg-2-deactive.svg);
+  }
+  .oss-serv-menu .srv-menu-02.ossSrvTabActive{
+    background-image: url(../../images/public-service/service-menu-bg-2-hover.svg);
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-02 .ossServ-tabText-item{
+    transform: rotate(52deg);
+    bottom: 90px;
+    right: 10px;
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-02 .ossServ-tabText-item .srv-menu-text{
+    transform: rotate(-52deg);
+  }
+
+  .oss-serv-menu .srv-menu-03{
+    background-image: url(../../images/public-service/service-menu-bg-3.svg);
+    height: 320px;
+    width: 240px;
+    bottom: 140px;
+    left: 319px;
+  }
+  .oss-serv-menu.activeTabMenuContainer .srv-menu-03{
+    background-image: url(../../images/public-service/service-menu-bg-3-deactive.svg);
+  }
+  .oss-serv-menu .srv-menu-03.ossSrvTabActive{
+    background-image: url(../../images/public-service/service-menu-bg-3-hover.svg);
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-03 .ossServ-tabText-item{
+    transform: rotate(90deg);
+    bottom: 90px;
+    right: 0px;
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-03 .ossServ-tabText-item .srv-menu-text{
+    transform: rotate(-90deg);
+  }
+
+  .oss-serv-menu .srv-menu-04{
+    background-image: url(../../images/public-service/service-menu-bg-4.svg);
+    height: 294px;
+    width: 268px;
+    bottom: 85px;
+    left: 485px;
+  }
+  .oss-serv-menu.activeTabMenuContainer .srv-menu-04{
+    background-image: url(../../images/public-service/service-menu-bg-4-deactive.svg);
+  }
+  .oss-serv-menu .srv-menu-04.ossSrvTabActive{
+    background-image: url(../../images/public-service/service-menu-bg-4-hover.svg);
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-04 .ossServ-tabText-item{
+    transform: rotate(125deg);
+    bottom: 95px;
+    right: 20px;
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-04 .ossServ-tabText-item .srv-menu-text{
+    transform: rotate(-125deg);
+  }
+
+  .oss-serv-menu .srv-menu-05{
+    background-image: url(../../images/public-service/service-menu-bg-5.svg);
+    height: 227px;
+    width: 322px;
+    bottom: 0;
+    right: 0;
+  }
+  .oss-serv-menu.activeTabMenuContainer .srv-menu-05{
+    background-image: url(../../images/public-service/service-menu-bg-5-deactive.svg);
+  }
+  .oss-serv-menu .srv-menu-05.ossSrvTabActive{
+    background-image: url(../../images/public-service/service-menu-bg-5-hover.svg);
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-05 .ossServ-tabText-item{
+    transform: rotate(-18deg);
+    bottom: 35px;
+    right: 40px;
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-05 .ossServ-tabText-item .srv-menu-text{
+    transform: rotate(18deg);
+  }
+}
+
+/**
+ * Mobile Tab Menu
+ */
+@media (max-width: 991px){
+  .oss-srv-center-text{
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .oss-srv-center-text span{
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .oss-serv-menu{
+    background: transparent;
+    border: none;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 10px;
+    row-gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+  .oss-serv-menu .oss-serv-menu-item{
+    flex: 0 0 auto;
+  }
+  .oss-serv-menu .oss-serv-menu-item .ossServ-tabText-item{
+    border: none !important;
+    display: flex;
+    text-align: center;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 6px;
+    background-color: #5A3666;
+    color: #ffffff;
+    height: 100%;
+    cursor: pointer;
+    transition: var(--ossp-transition);
+  }
+
+  .oss-srv-center-text span br,
+  .oss-serv-menu .oss-serv-menu-item .ossServ-tabText-item .srv-menu-text br{
+    display: none;
+  }
+
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-01 .ossServ-tabText-item{
+    background-color: #855297;
+  }
+  .oss-serv-menu.activeTabMenuContainer .srv-menu-01 .ossServ-tabText-item{
+    background-color: #F6E7FB;
+    color: #000000;
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-01 .ossServ-tabText-item.active,
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-01 .ossServ-tabText-item:hover{
+    background-color: #602874;
+    color: #ffffff;
+  }
+
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-02 .ossServ-tabText-item{
+    background-color: #9B1A44;
+  }
+  .oss-serv-menu.activeTabMenuContainer .srv-menu-02 .ossServ-tabText-item{
+    background-color: #FFE3EC;
+    color: #000000;
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-02 .ossServ-tabText-item.active,
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-02 .ossServ-tabText-item:hover{
+    background-color: #C4416B;
+    color: #ffffff;
+  }
+
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-03 .ossServ-tabText-item{
+    background-color: #B52624;
+  }
+  .oss-serv-menu.activeTabMenuContainer .srv-menu-03 .ossServ-tabText-item{
+    background-color: #FFE8E8;
+    color: #000000;
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-03 .ossServ-tabText-item.active,
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-03 .ossServ-tabText-item:hover{
+    background-color: #EB3F3D;
+    color: #ffffff;
+  }
+
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-04 .ossServ-tabText-item{
+    background-color: #C9A036;
+  }
+  .oss-serv-menu.activeTabMenuContainer .srv-menu-04 .ossServ-tabText-item{
+    background-color: #FFF8E5;
+    color: #000000;
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-04 .ossServ-tabText-item.active,
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-04 .ossServ-tabText-item:hover{
+    background-color: #F2C141;
+    color: #ffffff;
+  }
+
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-05 .ossServ-tabText-item{
+    background-color: #81AB35;
+  }
+  .oss-serv-menu.activeTabMenuContainer .srv-menu-05 .ossServ-tabText-item{
+    background-color: #F6FDEB;
+    color: #000000;
+  }
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-05 .ossServ-tabText-item.active,
+  .oss-serv-menu .oss-serv-menu-item.srv-menu-05 .ossServ-tabText-item:hover{
+    background-color: #A9D55A;
+    color: #ffffff;
+  }
+}
+
+
+/**
+ * Service Tab Content
+ */
+.oss-serv-tab-content{
+  padding-top: 20px;
+}
+.oss-serv-tab-content h2{
+  font-size: 20px;
+  text-align: center;
+}
+
+.serviceTabContent-data{
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 20px;
+}
+
+.srv-data-filter-menu{
+  position: relative;
+  background-color: #5A3666;
+  border-radius: 30px;
+  padding: 10px 10px 10px 44px;
+}
+
+#ossPSPD_servTab_01 .srv-data-filter-menu,
+.srv-data-filter-menu.sdf-menu-style-1{
+  background-color: #855297;
+}
+#ossPSPD_servTab_02 .srv-data-filter-menu,
+.srv-data-filter-menu.sdf-menu-style-2{
+  background-color: #9B1A44;
+}
+#ossPSPD_servTab_03 .srv-data-filter-menu,
+.srv-data-filter-menu.sdf-menu-style-3{
+  background-color: #B52624;
+}
+#ossPSPD_servTab_04 .srv-data-filter-menu,
+.srv-data-filter-menu.sdf-menu-style-4{
+  background-color: #C9A036;
+}
+#ossPSPD_servTab_05 .srv-data-filter-menu,
+.srv-data-filter-menu.sdf-menu-style-5{
+  background-color: #81AB35;
+}
+
+.srv-data-filter-menu:before{
+  content: "";
+  height: 24px;
+  width: 24px;
+  display: block;
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  margin-top: -12px;
+  background: url(../../images/public-service/icon-filter.svg);
+}
+.srv-data-filter-menu ul{
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 10px;
+  row-gap: 10px;
+}
+.srv-data-filter-menu ul li{
+  display: block;
+}
+.srv-data-filter-menu .src-filter-btn{
+  border: 1px solid #ffffff;
+  border-radius: 50px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  background: transparent;
+  transition: var(--ossp-transition);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+}
+.srv-data-filter-menu .src-filter-btn.active,
+.srv-data-filter-menu .src-filter-btn:hover{
+  color: #000000;
+  background: #F3F2F2;
+}
+
+.srv-data-filter-menu .src-filter-btn:hover,
+.srv-data-filter-menu .src-filter-btn:focus,
+.srv-data-filter-menu .src-filter-btn:active{
+  outline: none !important;
+}
+
+
+.srv-data-info-box{
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  column-gap: 15px;
+  row-gap: 15px;
+}
+.srv-data-info-box .data-infobox-item{
+  height: 110px;
+  width: 180px;
+  display: flex;
+  border-radius: 8px;
+  border: 1px solid #EAECF0;
+  background-color: #F2F4F7;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 10px 15px;
+  text-align: center;
+}
+.srv-data-info-box .data-infobox-item p{
+  margin: 0;
+  padding: 5px 0;
+  font-size: 15px;
+  line-height: 1.3;
+  color: #667085;
+}
+.srv-data-info-box .data-infobox-item .info-num{
+  font-size: 20px;
+  display: block;
+  line-height: 1.2;
+  color: #000000;
+  font-weight: bold;
+}
+
+.srv-data-info-table{
+  width: 100%;
+  position: relative;
+}
+.srv-data-table-container{
+  margin-top: 20px;
+}
+.srv-data-table-container .table-responsive .table{
+  min-width: 680px;
+}
+
+@media (max-width: 767px){
+  .srv-data-table-container .table-responsive .table{
+    min-width: 840px;
+  }
+}
+
+.td-text-light{
+  color: #A39898;
+}
+
+.entry-title{
+  position: relative;
+  width: 100%;
+  padding-left: 45px;
+  text-align: left;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+}
+.entry-title .entry-title-icon{
+  height: 34px;
+  width: 34px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.entry-title .entry-title-icon img{
+  max-width: 32px;
+  max-height: 32px;
+}
+.entry-title .entry-title-icon svg{
+  width: 30px;
+  max-height: 32px;
+}
+
+.bidaSrvDataInfoTable thead tr{
+  border-top: none;
+}
+.bidaSrvDataInfoTable tbody tr td,
+.bidaSrvDataInfoTable thead tr th{
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+}
+.bidaSrvDataInfoTable thead tr th{
+  border: none;
+  font-weight: 400;
+}
+table.bidaSrvDataInfoTable,
+.bidaSrvDataInfoTable tbody tr,
+.bidaSrvDataInfoTable tbody tr td{
+  border-color: #d3e6fc;
+}
+
+.bidaSrvDataInfoTable tbody tr td{
+  font-weight: 300;
+  background-color: #fafcff;
+  box-shadow: none;
+}
+.bidaSrvDataInfoTable tbody tr:nth-of-type(2n+1) td{
+  background-color: #f0f6fd;
+}
+
+.bottom-collapse-sec{
+  width: 100%;
+  position: relative;
+}
+.bottom-collapse-sec p{
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  padding: 5px 0;
+  margin: 0;
+}
+.bottom-collapse-sec li{
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 0;
+}
+.bottom-collapse-sec p.data-sec-title{
+  margin-bottom: 10px;
+  padding-top: 0;
+}
+
+.bottom-collapse-sec .expand-data-content{
+  text-align: left;
+  width: 100%;
+  padding: 12px 15px 10px;
+  background: #F5F8F6;
+  border-radius: 10px;
+}
+
+.data-sec-covers{
+  color: #333;
+  text-align: right !important;
+  font-size: 10px !important;
+  padding: 0 !important;
+}
+
+.bottom-collapse-sec .data-sec-title-parent {
+  display: flex;
+  justify-content: left;
+  text-align: left;
+  width: 100%;
+}
+
+.bottom-collapse-sec .data-sec-title{
+  position: relative;
+  padding-right: 20px;
+  /*text-align: right;*/
+  cursor: pointer;
+}
+.bottom-collapse-sec .data-sec-title:before{
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 1px;
+  height: 20px;
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--ossp-transition);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 10px 6px;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="10" viewBox="0 0 16 10" fill="none"><path d="M1 8.5L8 1.5L15 8.5" stroke="%23130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+}
+.bottom-collapse-sec .data-sec-title.collapsed:before{
+  transform: rotate(180deg);
+}
+
+
+/**
+ * New Changes
+ */
+@media (max-width: 767px) {
+  .oss-serv-menu .oss-serv-menu-item {
+    flex: 0 1 auto;
+  }
+  .bottom-collapse-sec{
+    margin-top: 20px;
+  }
+  .bottom-collapse-sec .expand-data-content p{
+    text-align: left;
+    margin-bottom: 0;
+  }
+  .data-sec-covers{
+    padding-top: 0 !important;;
+    text-align: right !important;
+    font-size: 9px !important;
+  }
+  .data-sec-title-parent {
+    padding: 10px 0 0 0 !important;
+    justify-content: right !important;
+    text-align: right !important;
+  }
+}
+
+@media (max-width: 576px) {
+  /*.data-sec-covers-small {*/
+  /*  display: block;*/
+  /*}*/
+}
+
+

@@ -1,0 +1,192 @@
+/**
+ * Section Name: BIDA Home Style
+ * Author: Hafizur Rahman
+ * Description: Description
+ * Version: 1.0.0
+ */
+
+.how-oss-works-sec{
+  background-color: rgba(223, 244, 236, 0.95);
+}
+
+.bida-flex-center{
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.bida-sec-img .img-radious{
+  border-radius: 15px;
+}
+
+.bida-sec-desc{
+  padding: 20px 0;
+  text-align: left;
+}
+.bida-sec-desc h2{
+  font-size: 36px;
+  line-height: 1.1;
+  font-weight: 700;
+  color: var(--ossp-primary);
+  margin: 0 0 10px;
+  padding: 0;
+}
+.bida-sec-desc p{
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 300;
+  margin: 0 0 10px;
+}
+.bida-sec-desc ul{
+  padding: 5px 0 0;
+  margin: 0 0 15px 16px;
+  list-style: disc;
+}
+.bida-sec-desc ul li{
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 300;
+}
+
+.bida-service-tab-sec{
+  background-color: #F7FCFF;
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+.bida-service-tab-sec .bida-srv-tab-menu-item{
+  position: relative;
+  padding: 20px 10px;
+  background: #ffffff;
+  border: 1px solid #EBEBEB !important;
+  border-radius: 6px;
+  transition: var(--ossp-transition);
+  display: flex;
+  height: 100%;
+}
+.bida-srv-tab-menu-item:before{
+  content: "";
+  width: auto;
+  position: absolute;
+  top: -6px;
+  left: -1px;
+  right: -1px;
+  height: 16px;
+  border-top: 10px solid var(--ossp-primary);
+  border-left: 2px solid var(--ossp-primary);
+  border-right: 2px solid var(--ossp-primary);
+  border-radius: 6px;
+  background: transparent;
+  overflow: hidden;
+  display: none;
+}
+.bida-srv-tab-menu-item:after{
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  background: #fff;
+  border-radius: 6px;
+  transition: var(--ossp-transition);
+  overflow: hidden;
+  display: none;
+}
+.bida-srv-tab-menu-item .srv-tab-menu{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  z-index: 10;
+}
+
+.bida-srv-tab-menu-item.active,
+.bida-srv-tab-menu-item.active:after,
+.bida-srv-tab-menu-item:hover:after,
+.bida-srv-tab-menu-item:hover{
+  background-color: #F3FFFB;
+}
+.bida-srv-tab-menu-item.active:before,
+.bida-srv-tab-menu-item.active:after,
+.bida-srv-tab-menu-item:hover:before,
+.bida-srv-tab-menu-item:hover:after{
+  display: block;
+}
+
+.bida-srv-tab-menu-item .bida-srv-menu-icon{
+  height: 45px;
+  width: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgba(91, 147, 255, 0.12);
+}
+.bida-srv-tab-menu-item .bida-srv-menu-icon svg{
+  max-width: 20px;
+  max-height: 20px;
+}
+.bida-srv-tab-menu-item .bida-srv-menu-text{
+  display: block;
+  text-align: center;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-top: 12px;
+  color: #112219;
+}
+
+.bida-service-tab-sec .nav-tabs{
+  border: none;
+}
+
+.bida-service-tab-content{
+  padding-top: 20px;
+}
+
+@media (min-width: 992px){
+  .sec-pad-left{
+    padding-left: 30px;
+  }
+
+  .bida-sec-img .img-radious{
+    border-radius: 25px;
+  }
+}
+@media (min-width: 1399px){
+  #howOSSWorksBody{
+    margin-top: 35px !important;
+  }
+}
+@media (max-width: 991px){
+  .res-center{
+    text-align: center;
+  }
+
+  .bida-service-tab-sec{
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .bida-sec-desc p{
+    font-size: 15px;
+  }
+  .bida-sec-desc h2{
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 991px){
+  .bida-sec-desc h2{
+    font-size: 30px;
+  }
+}
+
+
+

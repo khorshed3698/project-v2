@@ -1,0 +1,5 @@
+<?php
+
+/**
+ *	WorkPermitNew Helper
+ */

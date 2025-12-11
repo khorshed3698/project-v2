@@ -1,0 +1,1846 @@
+<?php
+$accessMode = ACL::getAccsessRight('TradeLicenseDSCC');
+if (!ACL::isAllowed($accessMode, $mode)) {
+    die('You have no access right! Please contact with system admin if you have any query.');
+}
+?>
+<link rel="stylesheet" href="{{ url('assets/css/jquery.steps.css') }}">
+<style>
+    .wizard > .content,
+    .wizard,
+    .tabcontrol {
+        overflow: visible;
+    }
+
+    .select2-selection {
+        max-width: 250px !important;
+    }
+
+    .select2 {
+        display: block !important;
+    }
+
+    .wizard > .steps > ul > li {
+        width: 25% !important;
+    }
+
+    .wizard > .steps .number {
+        font-size: 1.2em;
+    }
+
+    .intl-tel-input .country-list {
+        z-index: 5;
+    }
+
+
+    .col-md-7 {
+        margin-bottom: 10px;
+    }
+
+    label {
+        float: left !important;
+    }
+
+    .col-md-5 {
+        position: relative;
+        min-height: 1px;
+        padding-right: 5px;
+        padding-left: 8px;
+    }
+
+    form label {
+        font-weight: normal;
+        font-size: 16px;
+    }
+
+    .adhoc {
+        margin-left: 15px;
+    }
+
+    .adhoc button {
+        margin-top: 15px;
+    }
+
+    table thead {
+        background-color: #ddd;
+    }
+
+    .none-pointer {
+        pointer-events: none;
+    }
+
+    @media screen and (max-width: 550px) {
+        .button_last {
+            margin-top: 40px !important;
+        }
+
+    }
+</style>
+
+
+<section class="content" id="applicationForm">
+    <div class="col-md-12">
+        <div class="box" id="inputForm">
+            <div class="box-body">
+                {!! Session::has('success') ? '
+                <div class="alert alert-info alert-dismissible"><button aria-hidden="true" data-dismiss="alert"
+                        class="close" type="button">×</button>'. Session::get("success") .'</div>
+                ' : '' !!}
+                {!! Session::has('error') ? '
+                <div class="alert alert-danger alert-dismissible"><button aria-hidden="true" data-dismiss="alert"
+                        class="close" type="button">×</button>'. Session::get("error") .'</div>
+                ' : '' !!}
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h5><strong>Application For New Trade License (DSCC)</strong></h5>
+                    </div>
+
+                    {!! Form::open(array('url' => 'trade-license-dscc/store','method' => 'post', 'class' =>
+                    'form-horizontal', 'id' => 'NewConnection',
+                    'enctype' =>'multipart/form-data', 'files' => 'true')) !!}
+                    <input type="hidden" name="selected_file" id="selected_file"/>
+                    <input type="hidden" name="validateFieldName" id="validateFieldName"/>
+                    <input type="hidden" name="isRequired" id="isRequired"/>
+                    <input type="hidden" name="app_id" value="{{ \App\Libraries\Encryption::encodeId($appInfo->id) }}"
+                           id="app_id"/>
+
+                    <h3 class="text-center stepHeader"> General Information</h3>
+                    <fieldset>
+                        <div class="panel panel-primary">
+                            <div class="panel-heading"><strong>Business Type</strong></div>
+                            <div class="panel-body">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <table class="table table-bordered table-hover">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center">Fiscal Year</th>
+                                                <th class="text-center">Business Type 1</th>
+                                                <th class="text-center">Business Type 2</th>
+                                                <th class="text-center">License Fee</th>
+                                                <th class="text-center">Action</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="businessTypeDetails">
+                                            @if(count($appData->fiscalYear) > 0)
+                                                <?php $inc = 0; ?>
+                                                @foreach($appData->fiscalYear as $key => $value)
+                                                    <?php
+                                                    // dump($appData->fiscal_year[$key]);
+                                                    //dump($appData->description_of_load[0]);
+                                                    $lkey = ($key + 1);
+                                                    ?>
+                                                    <tr id="rowCountbusinessTypeDetails_{{$key}}"
+                                                        data-number="{{$key}}">
+                                                        <td class="col-md-3">{!! Form::select("fiscalYear[$key]",[],$appData->fiscalYear[$key],['class' =>'form-control input-md fiscal_year required','data-value'=>$appData->fiscalYear[$key],'id'=>'fiscalYear_'.$lkey]) !!}</td>
+                                                        <td class="col-md-3">{!! Form::select("businessType_1[$key]",[],$appData->businessType_1[$key],['class' =>'form-control input-md business_type_1 required','data-value'=>$appData->businessType_1[$key],'data-value2'=>$appData->businessType_2[$key],'id'=>'businessType1_'.$key]) !!}</td>
+                                                        <td class="col-md-3">{!! Form::select("businessType_2[$key]",[],$appData->businessType_2[$key],['class' =>'form-control input-md business_type_2 required','data-value'=>$appData->businessType_2[$key],'data-fee'=>$appData->businessLicense_fee[$key],'id'=>'businessType2_'.$key,'placeholder'=>'Select Business Type 1 First']) !!}</td>
+                                                        <td class="col-md-3"> {!! Form::text("businessLicense_fee[$key]",$appData->businessLicense_fee[$key],['class' => 'form-control input-md businessLicenseFee  required onlyNumber','id'=>'businessLicenseFee_'.$key,'readonly']) !!}</td>
+                                                        <td style="vertical-align: middle; text-align: center">
+                                                            <?php if ($inc == 0) { ?>
+                                                            <a class="btn btn-sm btn-primary addTableRows"
+                                                               title="Add more business type"
+                                                               onclick="addTableRowTL('businessTypeDetails', 'rowCountbusinessTypeDetails_0');">
+                                                                <i class="fa fa-plus"></i></a>
+                                                            <?php } else { ?>
+                                                            @if($viewMode != 'on')
+                                                                <a href="javascript:void(0);"
+                                                                   class="btn btn-sm btn-danger removeRow"
+                                                                   onclick="removeTableRow('businessTypeDetails','rowCountbusinessTypeDetails_{{$inc}}');">
+                                                                    <i class="fa fa-times" aria-hidden="true"></i></a>
+                                                        @endif
+                                                        <?php } ?>
+                                                    </tr>
+                                                    <?php $inc++; ?>
+
+                                                @endforeach
+                                            @else
+                                                <tr id="rowCountbusinessTypeDetails_0" data-number="0">
+                                                    <td class="col-md-3">{!! Form::select('fiscalYear[0]',[],null,['class' =>'form-control input-md fiscal_year required','id'=>'fiscalYear_0']) !!}</td>
+                                                    <td class="col-md-3">{!! Form::select('businessType_1[0]',[],null,['class' =>'form-control input-md business_type_1 required','id'=>'businessType1_0']) !!}</td>
+                                                    <td class="col-md-3">{!! Form::select('businessType_2[0]',[],null,['class' =>'form-control input-md business_type_2 required','id'=>'businessType2_0','placeholder'=>'Select Business Type 1 First']) !!}</td>
+                                                    <td class="col-md-3">{!! Form::text('businessLicense_fee[0]','',['class' =>'form-control input-md businessLicenseFee  required onlyNumber','id'=>'businessLicenseFee_0','readonly']) !!}</td>
+                                                    <td style="vertical-align: middle; text-align: center">
+                                                        <a class="btn btn-sm btn-primary addTableRows"
+                                                           title="Add more business type"
+                                                           onclick="addTableRowTL('businessTypeDetails', 'rowCountbusinessTypeDetails_0');">
+                                                            <i class="fa fa-plus"></i></a>
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-primary">
+                            <div class="panel-heading"><strong>Business Organization Details</strong></div>
+                            <div class="panel-body">
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('business_org_name','Name of the Business organization :',['class'=>'text-left col-md-7']) !!}
+                                            <div class="col-md-5">
+                                                {!! Form::text('business_org_name',!empty($appData->business_org_name) ? $appData->business_org_name : '',['class' => 'form-control input-md ','id'=>'business_org_name']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('business_org_nature','Nature of the Business organization :',['class'=>'text-left col-md-7']) !!}
+                                            <div class="col-md-5">
+                                                {!! Form::select('business_org_nature',[],'',['class' => 'form-control input-md none-pointer','id'=>'business_org_nature','readonly']) !!}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('paid_capital','Paid up Capital (in the case of ltd. company) :',['class'=>'text-left col-md-7']) !!}
+                                            <div class="col-md-5">
+                                                {!! Form::select('paid_capital',[],'',['class' => 'form-control input-md','id'=>'paid_capital']) !!}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <div class="panel panel-primary">
+                            <div class="panel-heading"><strong>Applicant Basic Info</strong></div>
+                            <div class="panel-body">
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('applicant_name','Name of the Applicant :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('applicant_name',!empty($appData->applicant_name) ? $appData->applicant_name : '',['class' => 'form-control input-md ','id'=>'applicant_name']) !!}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('applicant_fathers_name','Applicant\'s Father\'s Name :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('applicant_fathers_name',!empty($appData->applicant_fathers_name) ? $appData->applicant_fathers_name : '',['class' => 'form-control input-md ','id'=>'applicant_fathers_name']) !!}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('applicant_mothers_name','Applicant\'s Mother\'s Name :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('applicant_mothers_name',!empty($appData->applicant_mothers_name) ? $appData->applicant_mothers_name : '',['class' => 'form-control input-md ','id'=>'applicant_mothers_name']) !!}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('spouse_name','Spouse\'s Name :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('spouse_name',!empty($appData->spouse_name) ? $appData->spouse_name : '',['class' => 'form-control input-md ','id'=>'spouse_name']) !!}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('applicant_relation_org','Applicant\'s relationship with the organization :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('applicant_relation_org',!empty($appData->applicant_relation_org) ? $appData->applicant_relation_org : '',['class' => 'form-control input-md ','id'=>'_1']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('nationality','Nationality Of the Applicant :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('nationality',!empty($appData->nationality) ? $appData->nationality : '',['class' => 'form-control input-md ','id'=>'nationality']) !!}
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+                                {{-- National ID & Passport --}}
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('nid_number','Identity Type :',['class'=>'text-left col-md-6','id'=>'nid_number_label']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::select('identity_type', ['nid'=>"National ID",'passport'=>'Passport'],!empty($appData->identity_type) ? $appData->identity_type : '',['class' => 'form-control input-md ','id'=>'identity_type']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            <div id="nidDiv">
+                                                {!! Form::label('nid_number','NID number :',['class'=>'text-left col-md-6']) !!}
+                                                <div class="col-md-6">
+                                                    {!! Form::text('nid_number',!empty($appData->nid_number) ? $appData->nid_number : '',['class' => 'form-control input-md onlyNumber','id'=>'nid_number']) !!}
+                                                </div>
+                                            </div>
+                                            <div id="passportDiv" style="display: none">
+                                                {!! Form::label('passport','Passport :',['class'=>'text-left col-md-6']) !!}
+                                                <div class="col-md-6">
+                                                    {!! Form::text('passport',!empty($appData->passport) ? $appData->passport : '',['class' => 'form-control input-md ','id'=>'passport']) !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{-- National ID & Passport --}}
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('birth_reg_no','Birth Reg. No :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('birth_reg_no',!empty($appData->birth_reg_no) ? $appData->birth_reg_no : '',['class' => 'form-control input-md onlyNumber','id'=>'birth_reg_no']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('bin_no','BIN No. :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('bin_no',!empty($appData->bin_no) ? $appData->bin_no : '',['class' => 'form-control input-md onlyNumber','id'=>'bin_no']) !!}
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('mobile_no','Applicant\'s Mobile No. :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('mobile_no',!empty($appData->mobile_no) ? $appData->mobile_no : '',['class' => 'form-control input-md onlyNumber','id'=>'mobile_no']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('email','Applicant\'s Email ID :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('email',!empty($appData->email) ? $appData->email : '',['class' => 'form-control input-md email','id'=>'email']) !!}
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('other_identity','Other Identity :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('other_identity',!empty($appData->other_identity) ? $appData->other_identity : '',['class' => 'form-control input-md ','id'=>'other_identity']) !!}
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('residential_address','Applicant\'s Residential Address :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::textarea('residential_address',!empty($appData->residential_address) ? $appData->residential_address : '',['class' => 'form-control input-md ','rows'=>'3','id'=>'residential_address']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('proposed_business_address','Proposed Business Address :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::textarea('proposed_business_address',!empty($appData->proposed_business_address) ? $appData->proposed_business_address : '',['class' => 'form-control input-md ','rows'=>'4','id'=>'proposed_business_address']) !!}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="panel panel-primary">
+                            <div class="panel-heading"><strong>Permanent Address of the Applicant</strong></div>
+                            <div class="panel-body">
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('permanent_holding_no','Holding No. :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('permanent_holding_no',!empty($appData->permanent_holding_no) ? $appData->permanent_holding_no : '',['class' => 'form-control input-md ','id'=>'permanent_holding_no']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('permanent_road_no','Road No. :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('permanent_road_no',!empty($appData->permanent_road_no) ? $appData->permanent_road_no : '',['class' => 'form-control input-md ','id'=>'permanent_road_no']) !!}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('permanent_village_or_mahalla','Village\ Mahalla :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('permanent_village_or_mahalla',!empty($appData->permanent_village_or_mahalla) ? $appData->permanent_village_or_mahalla : '',['class' => 'form-control input-md ','id'=>'permanent_village_or_mahalla']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('permanent_post_code','Post Code :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('permanent_post_code',!empty($appData->permanent_post_code) ? $appData->permanent_post_code : '',['class' => 'form-control input-md ','id'=>'permanent_post_code']) !!}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('permanent_division','Division :',['class'=>'text-left col-md-6']) !!}
+
+                                            <div class="col-md-6">
+                                                {!! Form::select('permanent_division', $divisions,!empty($appData->permanent_division) ? $appData->permanent_division : '',['class' => 'form-control input-md ','id'=>'permanent_division','onchange'=>"getDistrictByDivisionCustom('permanent_district', this.value, 'permanent_district', '$appData->permanent_district')"]) !!}
+                                            </div>
+                                        </div>
+
+
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('permanent_district','District  :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::select('permanent_district',[],!empty($appData->permanent_district) ? $appData->permanent_district : '',['class' => 'form-control input-md select2input select2input','placeholder' => 'Select division first','id'=>'permanent_district','onchange'=>"getThanaByDistrictCustom('permanent_police_station', this.value, 'permanent_police_station', '$appData->permanent_police_station')"]) !!}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('permanent_police_station','Police Station :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::select('permanent_police_station',[],!empty($appData->permanent_police_station) ? $appData->permanent_police_station : '',['class' => 'form-control input-md select2input','placeholder' => 'Select district first','id'=>'permanent_police_station']) !!}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="panel panel-primary">
+                            <div class="panel-heading"><strong>Owner's Current Address</strong></div>
+                            <div class="panel-body">
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('current_holding_no','Holding No. :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('current_holding_no',!empty($appData->current_holding_no) ? $appData->current_holding_no : '',['class' => 'form-control input-md ','id'=>'current_holding_no']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('current_road_no','Road No. :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('current_road_no',!empty($appData->current_road_no) ? $appData->current_road_no : '',['class' => 'form-control input-md ','id'=>'current_road_no']) !!}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('current_village_or_mahalla','Village\ Mahalla :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('current_village_or_mahalla',!empty($appData->current_village_or_mahalla) ? $appData->current_village_or_mahalla : '',['class' => 'form-control input-md ','id'=>'current_village_or_mahalla']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('current_post_code','Post Code :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('current_post_code',!empty($appData->current_post_code) ? $appData->current_post_code : '',['class' => 'form-control input-md ','id'=>'current_post_code']) !!}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('current_division','Division :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::select('current_division',$divisions,!empty($appData->current_division) ? $appData->current_division : '',['class' => 'form-control input-md ','id'=>'current_division','onchange'=>"getDistrictByDivisionCustom('current_district', this.value, 'current_district','$appData->current_district')"]) !!}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('current_district','District  :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::select('current_district',[],!empty($appData->current_district) ? $appData->current_district : '',['class' => 'form-control input-md select2input','id'=>'current_district','placeholder' => 'Select division first','onchange'=>"getThanaByDistrictCustom('police_station', this.value, 'police_station','$appData->police_station')"]) !!}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('police_station','Police Station :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::select('police_station',[],$appData->police_station,['class' => 'form-control input-md select2input','id'=>'police_station','placeholder' => 'Select district first']) !!}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="panel panel-primary">
+                            <div class="panel-heading"><strong>Business Details</strong></div>
+                            <div class="panel-body">
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('business_capital','Business Capital :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('business_capital',!empty($appData->business_capital) ? $appData->business_capital : '',['class' => 'form-control input-md onlyNumber','id'=>'business_capital']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6  col-xs-12">
+                                            {!! Form::label('business_start_date','Business Start Date:',['class'=>'col-md-6']) !!}
+                                            <div class="datepicker col-md-6">
+                                                {!! Form::text('business_start_date',!empty($appData->business_start_date) ? $appData->business_start_date : '',['class' => 'form-control
+                                                input-md','id'=>'business_start_date','readonly','style'=>'background:white;']) !!}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('tin_number','TIN number :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('tin_number',!empty($appData->tin_number) ? $appData->tin_number : '',['class' => 'form-control input-md onlyNumber','id'=>'tin_number']) !!}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('place_of_business','Place of Business (Rent/Own) :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::select('place_of_business',['rent@Rent'=>'Rent','own@Own'=>'Own'],!empty($appData->place_of_business) ? $appData->place_of_business : '',['class' => 'form-control input-md ','id'=>'place_of_business']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('business_shop_rent','Business/Shop Space Own/ Rent (Tax receipt of own house should be attached) :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::select('business_shop_rent',['Y@Yes'=>'Yes','N@No'=>'No'],!empty($appData->business_shop_rent) ? $appData->business_shop_rent : '',['class' => 'form-control input-md ','id'=>'_1']) !!}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('sign_board','Is there a Sign Board? :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::select('sign_board',['Y@Yes'=>'Yes','N@No'=>'No'],!empty($appData->sign_board) ? $appData->sign_board : '',['class' => 'form-control input-md ','id'=>'_1']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('proposed_place','Proposed Shop/Place of Business, Municipal Land/Government Land  :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::select('proposed_place',['Y@Yes'=>'Yes','N@No'=>'No'],!empty($appData->proposed_place) ? $appData->proposed_place : '',['class' => 'form-control input-md ','id'=>'proposed_place']) !!}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('shop_floor','Shop Floor/Office on Which Floor :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::select('shop_floor',['1@Ground Floor'=>'Ground Floor','2@Second Floor'=>'Second Floor','3@Third Floor'=>'Third Floor','4@Fourth Floor'=>'Fourth Floor'],!empty($appData->shop_floor) ? $appData->shop_floor : '',['class' => 'form-control input-md ','id'=>'shop_floor']) !!}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="panel panel-info">
+                                    <div class="panel-body">
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-4 col-xs-12">
+                                                    {!! Form::label('zone','Zone :',['class'=>'text-left col-md-6']) !!}
+                                                    <div class="col-md-6">
+                                                        {!! Form::select('zone',[],'',['class' => 'form-control input-md ','id'=>'zone']) !!}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-xs-12">
+                                                    {!! Form::label('ward','Ward  :',['class'=>'text-left col-md-6']) !!}
+                                                    <div class="col-md-6">
+                                                        {!! Form::select('ward',[],'',['class' => 'form-control input-md ','id'=>'ward']) !!}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-xs-12">
+                                                    {!! Form::label('sector_or_section','Sector/Section :',['class'=>'text-left col-md-6']) !!}
+                                                    <div class="col-md-6">
+                                                        {!! Form::text('sector_or_section',!empty($appData->sector_or_section) ? $appData->sector_or_section : '',['class' => 'form-control input-md ','id'=>'sector_or_section']) !!}
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-4 col-xs-12">
+                                                    {!! Form::label('area_or_block','Area/Block :',['class'=>'text-left col-md-6']) !!}
+                                                    <div class="col-md-6">
+                                                        {!! Form::text('area_or_block',!empty($appData->area_or_block) ? $appData->area_or_block : '',['class' => 'form-control input-md ','id'=>'area_or_block']) !!}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-xs-12">
+                                                    {!! Form::label('road','Road :',['class'=>'text-left col-md-6']) !!}
+                                                    <div class="col-md-6">
+                                                        {!! Form::text('road',!empty($appData->road) ? $appData->road : '',['class' => 'form-control input-md ','id'=>'road']) !!}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-xs-12">
+                                                    {!! Form::label('plot_or_holding_no','Plot/Holding no. :',['class'=>'text-left col-md-6']) !!}
+                                                    <div class="col-md-6">
+                                                        {!! Form::text('plot_or_holding_no',!empty($appData->plot_or_holding_no) ? $appData->plot_or_holding_no : '',['class' => 'form-control input-md ','id'=>'plot_or_holding_no']) !!}
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-4 col-xs-12">
+                                                    {!! Form::label('shop_no','Shop No. :',['class'=>'text-left col-md-6']) !!}
+                                                    <div class="col-md-6">
+                                                        {!! Form::text('shop_no',!empty($appData->shop_no) ? $appData->shop_no : '',['class' => 'form-control input-md ','id'=>'shop_no']) !!}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-xs-12">
+                                                    {!! Form::label('license_fee','License fee :',['class'=>'text-left col-md-6']) !!}
+                                                    <div class="col-md-6">
+                                                        {!! Form::text('license_fee',!empty($appData->license_fee) ? $appData->license_fee : '',['class' => 'form-control input-md onlyNumber','id'=>'license_fee','readonly']) !!}
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+
+                                                <div class="col-md-4 col-xs-12">
+                                                    {!! Form::label('sign_board_sqft','Sign Board sqft :',['class'=>'text-left col-md-6']) !!}
+                                                    <div class="col-md-6">
+                                                        {!! Form::text('sign_board_sqft',!empty($appData->sign_board_sqft) ? $appData->sign_board_sqft : '',['class' => 'form-control input-md onlyNumber','id'=>'sign_board_sqft']) !!}
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 col-xs-12">
+                                                    {!! Form::label('sign_board_fee','Sign Board fee :',['class'=>'text-left col-md-6']) !!}
+                                                    <div class="col-md-6">
+                                                        {!! Form::text('sign_board_fee',!empty($appData->sign_board_fee) ? $appData->sign_board_fee : '',['class' => 'form-control input-md onlyNumber','id'=>'sign_board_fee','readonly']) !!}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-xs-12">
+                                                    {!! Form::label('book_price','Book Price :',['class'=>'text-left col-md-6']) !!}
+                                                    <div class="col-md-6">
+                                                        {!! Form::text('book_price',!empty($appData->book_price) ? $appData->book_price : '',['class' => 'form-control input-md onlyNumber','id'=>'book_price']) !!}
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-4 col-xs-12">
+                                                    {!! Form::label('outstanding','Outstanding :',['class'=>'text-left col-md-6']) !!}
+                                                    <div class="col-md-6">
+                                                        {!! Form::text('outstanding',!empty($appData->outstanding) ? $appData->outstanding : '',['class' => 'form-control input-md ','id'=>'outstanding']) !!}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-xs-12">
+                                                    {!! Form::label('outstanding_surcharge','Outstanding Surcharge :',['class'=>'text-left col-md-6']) !!}
+                                                    <div class="col-md-6">
+                                                        {!! Form::text('outstanding_surcharge',!empty($appData->outstanding_surcharge) ? $appData->outstanding_surcharge : '',['class' => 'form-control input-md onlyNumber','id'=>'outstanding_surcharge']) !!}
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 col-xs-12">
+                                                    {!! Form::label('vat_arrears','Vat Arrears :',['class'=>'text-left col-md-6']) !!}
+                                                    <div class="col-md-6">
+                                                        {!! Form::text('vat_arrears',!empty($appData->vat_arrears) ? $appData->vat_arrears : '',['class' => 'form-control input-md onlyNumber','id'=>'vat_arrears']) !!}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('number_of_years_for_fee','Number of years for fee :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::select('number_of_years_for_fee',['1@1'=>'1','2@62'=>'2','3@3'=>'3','4@4'=>'4','5@5'=>'5','6@6'=>'6'],!empty($appData->business_org_name) ? $appData->business_org_name : '',['class' => 'form-control input-md none-pointer','id'=>'number_of_years_for_fee','readonly']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('annual_vat','Annual Vat :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('annual_vat',!empty($appData->annual_vat) ? $appData->annual_vat : '',['class' => 'form-control input-md onlyNumber','id'=>'annual_vat','readonly']) !!}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('total_vat','Total Vat :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('total_vat',!empty($appData->total_vat) ? $appData->total_vat : '',['class' => 'form-control input-md onlyNumber','id'=>'total_vat','readonly']) !!}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('income_tax_money','Income Tax Money :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('income_tax_money',!empty($appData->income_tax_money) ? $appData->income_tax_money : '',['class' => 'form-control input-md onlyNumber','id'=>'income_tax_money']) !!}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('total_price','Total Price/Total Assessed Price:',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::text('total_price',!empty($appData->total_price) ? $appData->total_price : '',['class' => 'form-control input-md onlyNumber','id'=>'total_price','readonly']) !!}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xs-12">
+                                            {!! Form::label('new_or_old_trade_license','New/Old Trade License :',['class'=>'text-left col-md-6']) !!}
+                                            <div class="col-md-6">
+                                                {!! Form::select('new_or_old_trade_license',['new@New'=>'New','old@Old'=>'Old'],!empty($appData->new_or_old_trade_license) ? $appData->new_or_old_trade_license : '',['class' => 'form-control input-md none-pointer','id'=>'new_or_old_trade_license','readonly']) !!}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </fieldset>
+
+                    <h3 class="text-center stepHeader">Attachments</h3>
+                    <fieldset>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="docListDiv">
+                                    @include('TradeLicenseDSCC::documents')
+                                </div>
+
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <h3 class="text-center stepHeader">Declaration</h3>
+                    <fieldset>
+                        <div class="panel panel-info">
+                            <div class="panel-heading" style="padding-bottom: 4px;">
+                                <strong>DECLARATION</strong>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <ol type="a">
+                                                <li>
+                                                    <p>I do hereby declare that the information given above is true to
+                                                        the best of my knowledge and I shall be liable for any false
+                                                        information/ statement given</p>
+                                                </li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table class="table table-bordered table-striped">
+                                    <thead class="alert alert-info">
+                                    <tr>
+                                        <th colspan="3" style="font-size: 15px">Authorized person of the
+                                            organization
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            {!! Form::label('auth_name','Full name:', ['class'=>'required-star'])
+                                            !!}
+                                            {!! Form::text('auth_name',
+                                            \App\Libraries\CommonFunction::getUserFullName(), ['class' =>
+                                            'form-control input-md required', 'readonly']) !!}
+                                            {!! $errors->first('auth_name','<span
+                                                class="help-block">:message</span>') !!}
+                                        </td>
+                                        <td>
+                                            {!! Form::label('auth_email','Email:', ['class'=>'required-star']) !!}
+                                            {!! Form::email('auth_email', Auth::user()->user_email, ['class' =>
+                                            'form-control required input-md email', 'readonly']) !!}
+                                            {!! $errors->first('auth_email','<span
+                                                class="help-block">:message</span>') !!}
+                                        </td>
+                                        <td>
+                                            {!! Form::label('auth_cell_number','Cell number:',
+                                            ['class'=>'required-star']) !!}<br>
+                                            {!! Form::text('auth_cell_number', Auth::user()->user_phone, ['class' =>
+                                            'form-control input-md required phone_or_mobile', 'readonly']) !!}
+                                            {!! $errors->first('auth_cell_number','<span
+                                                class="help-block">:message</span>') !!}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3"><strong>Date : </strong><?php echo date('F d,Y')?></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <label>
+                                            {!! Form::checkbox('accept_terms',1,null, array('id'=>'accept_terms',
+                                            'class'=>'required')) !!}
+                                            All the details and information provided in this form are true and complete.
+                                            I am aware that any untrue/incomplete statement may result in delay in BIN
+                                            issuance and I may be subjected to full penal action under the Value Added
+                                            Tax and Supplementary Duty Act, 2012 or any other applicable Act Prevailing
+                                            at present.
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <h3 class="text-center stepHeader">Payment & Submit</h3>
+                    <fieldset>
+
+                    </fieldset>
+
+                    <div class="row">
+                        <div class="col-md-6 col-xs-12">
+                            <div class="pull-left">
+                                <button type="submit" id="save_as_draft" class="btn btn-info btn-md cancel"
+                                        value="draft" name="actionBtn">Save as Draft
+                                </button>
+                            </div>
+
+                            <div class="pull-left" style="padding-left: 1em;">
+                                <button type="submit" id="submitForm" style="cursor: pointer;"
+                                        class="btn btn-success btn-md" value="Submit" name="actionBtn">Payment &amp;
+                                    Submit
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-xs-12 button_last">
+                            <div class="clearfix"></div>
+                        </div>
+                    </div> {{--row--}}
+
+                </div>
+
+                {!! Form::close() !!}
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="{{ asset("assets/scripts/jquery.steps.js") }}"></script>
+<script src="{{ asset('assets/scripts/jquery.validate.js') }}"></script>
+<script src="{{ asset("assets/scripts/apicall.js?v=1") }}" type="text/javascript"></script>
+<script>
+
+    $(document).ready(function () {
+        var form = $("#NewConnection").show();
+        form.find('#submitForm').css('display', 'none');
+        form.find('.actions').css('top', '-15px !important');
+        form.steps({
+            headerTag: "h3",
+            bodyTag: "fieldset",
+            transitionEffect: "slideLeft",
+            onStepChanging: function (event, currentIndex, newIndex) {
+                // Always allow previous action even if the current form is not valid!
+                if (currentIndex > newIndex) {
+                    return true;
+                }
+                if (newIndex == 1) {
+                    var nid = $("#nid_number").val();
+                    var passport = $("#passport").val();
+                    var RegID = $("#birth_reg_no").val();
+                    if (nid !='' || passport !='' || RegID !='' ) {
+                        return form.valid();
+                    } else {
+                        swal({
+                            type: 'warning',
+                            title: 'Oops...',
+                            text: 'In order to Proceed please provide NID/Passport/ Birth-Reg No.'
+                        });
+                        return false;
+                    }
+                }
+                // Forbid next action on "Warning" step if the user is to young
+                if (newIndex === 3 && Number($("#age-2").val()) < 18) {
+                    return false;
+                }
+                // Needed in some cases if the user went back (clean up)
+                if (currentIndex < newIndex) {
+                    // To remove error styles
+                    form.find(".body:eq(" + newIndex + ") label.error").remove();
+                    form.find(".body:eq(" + newIndex + ") .error").removeClass("error");
+                }
+                form.validate().settings.ignore = ":disabled,:hidden";
+                return form.valid();
+            },
+            onStepChanged: function (event, currentIndex, priorIndex) {
+                if (currentIndex != -1) {
+                    form.find('#save_as_draft').css('display', 'block');
+                    form.find('.actions').css('top', '-42px');
+                } else {
+                    form.find('#save_as_draft').css('display', 'none');
+                    form.find('.actions').css('top', '-15px');
+                }
+                if (currentIndex == 3) {
+                    form.find('#submitForm').css('display', 'block');
+
+                } else {
+                    form.find('#submitForm').css('display', 'none');
+                }
+
+            },
+            onFinishing: function (event, currentIndex) {
+                form.validate().settings.ignore = ":disabled";
+                return form.valid();
+            },
+            onFinished: function (event, currentIndex) {
+                errorPlacement: function errorPlacement(error, element) {
+                    element.before(error);
+                }
+            }
+        });
+
+        var popupWindow = null;
+        $('.finish').on('click', function (e) {
+            form.validate().settings.ignore = ":disabled,:hidden";
+            if (form.valid()) {
+                $('body').css({"display": "none"});
+                popupWindow = window.open('<?php echo URL::to('licence-application/preview?form=NewConnection@2'); ?>');
+            } else {
+                return false;
+            }
+        });
+
+        {{----end step js---}}
+        $("#NewConnection").validate({
+            rules: {
+                field: {
+                    required: true,
+                    email: true,
+
+                }
+            }
+        });
+
+        // Datepicker Plugin initialize
+        var today = new Date();
+        var yyyy = today.getFullYear();
+        $('.datepicker').datetimepicker({
+            viewMode: 'days',
+            format: 'DD-MMM-YYYY',
+            maxDate: '01/01/' + (yyyy + 100),
+            minDate: '01/01/' + (yyyy - 100),
+            ignoreReadonly: true
+        });
+
+        var calculatedYear = (new Date).getFullYear() - 18;
+        var currentMonth = (new Date).getMonth();
+        var currentDay = (new Date).getDate();
+
+        $('.datepickerDob').datetimepicker({
+            viewMode: 'days',
+            format: 'DD-MMM-YYYY',
+            minDate: '01/01/' + (yyyy - 150),
+            maxDate: new Date(calculatedYear, currentMonth, currentDay),
+            ignoreReadonly: true
+        });
+
+        $('.datepickerDob').find('input').val('');
+
+        $('.datepickerFuture').datetimepicker({
+            viewMode: 'days',
+            format: 'DD-MMM-YYYY',
+            minDate: 'now',
+            maxDate: '01/01/' + (yyyy + 6)
+        });
+
+        $('#nid_number').on('blur', function (e) {
+            var nid = $('#nid_number').val().length
+            if (nid == 10 || nid == 13 || nid == 17) {
+                $('#nid_number').removeClass('error')
+            } else {
+                $('#nid_number').addClass('error')
+                $('#nid_number').val('')
+            }
+        })
+
+        $('.onlyNumber').on('keydown', function (e) {
+            //period decimal
+            if ((e.which >= 48 && e.which <= 57)
+                //numpad decimal
+                || (e.which >= 96 && e.which <= 105)
+                // Allow: backspace, delete, tab, escape, enter and .
+                || $.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1
+                // Allow: Ctrl+A
+                || (e.keyCode == 65 && e.ctrlKey === true)
+                // Allow: Ctrl+C
+                || (e.keyCode == 67 && e.ctrlKey === true)
+                // Allow: Ctrl+V
+                || (e.keyCode == 86 && e.ctrlKey === true)
+                // Allow: Ctrl+X
+                || (e.keyCode == 88 && e.ctrlKey === true)
+                // Allow: home, end, left, right
+                || (e.keyCode >= 35 && e.keyCode <= 39)) {
+
+                var $this = $(this);
+                setTimeout(function () {
+                    $this.val($this.val().replace(/[^0-9.]/g, ''));
+                }, 4);
+
+                var thisVal = $(this).val();
+                if (thisVal.indexOf(".") != -1 && e.key == '.') {
+                    return false;
+                }
+                $(this).removeClass('error');
+                return true;
+            } else {
+                $(this).addClass('error');
+                return false;
+            }
+        }).on('paste', function (e) {
+            var $this = $(this);
+            setTimeout(function () {
+                $this.val($this.val().replace(/[^0-9]/g, ''));
+            }, 5);
+        });
+
+        $('.business_type_1').select2({
+            width: 'element'
+        });
+        $('.business_type_2').select2({
+            width: 'element'
+        });
+
+    });
+
+    /* Get list from API end */
+
+    $(document).ready(function () {
+        $('body').on('click', '.reCallApi', function () {
+            var id = $(this).attr('data-id');
+            $("#" + id).trigger('keydown');
+            $(this).remove();
+        });
+        $('.business_type_1').each(function (index) {
+            $('#businessType1_' + index).select2();
+        });
+
+        $(function () {
+            $('#organization_panel').hide()
+            token = "{{$token}}"
+            tokenUrl = '/trade-license-dscc/get-refresh-token'
+
+            $('.fiscal_year').keydown()
+            $('.business_type_1').keydown()
+            $('#zone').keydown()
+            $('#business_org_nature').keydown()
+            $('#paid_capital').keydown()
+            $('#permanent_division').trigger('change');
+            $('#current_division').trigger('change');
+            $('#identity_type').trigger('change');
+
+            getDoc()
+        });
+
+        $('.fiscal_year').on('keydown', function (el) {
+            var key = el.which;
+            if (typeof key !== "undefined") {
+                return false;
+            }
+
+            $(this).after('<span class="loading_data">Loading...</span>');
+            var e = $(this);
+            var api_url = "{{$tl_dscc_service_url}}/fiscal-years";
+            var selected_value = $(this).attr("data-value");
+            var calling_id = $(this).attr('id'); // for callback
+            var element_id = "fiscal_id"; //dynamic id for callback
+            var element_name = "name_en"; //dynamic name for callback
+            var data = '';
+            var options = {apiUrl: api_url, token: token, data: data, tokenUrl: tokenUrl}; // for lib
+            var arrays = [calling_id, selected_value, element_id, element_name]; // for callback
+
+            var apiHeaders = [
+                {
+                    key: "Content-Type",
+                    value: 'application/json'
+                },
+                {
+                    key: "client-id",
+                    value: 'OSS_BIDA'
+                },
+            ];
+
+            apiCallGet(e, options, apiHeaders, callbackResponse, arrays);
+
+        })
+
+        $('.business_type_1').on('keydown', function (el) {
+            var key = el.which;
+            if (typeof key !== "undefined") {
+                return false;
+            }
+
+            $(this).after('<span class="loading_data">Loading...</span>');
+            var e = $(this);
+            var api_url = "{{$tl_dscc_service_url}}/business-type-1";
+            var selected_value = $(this).attr("data-value");
+            var calling_id = $(this).attr('id'); // for callback
+            var element_id = "type_1_id"; //dynamic id for callback
+            var element_name = "name_en"; //dynamic name for callback
+            var data = null;
+            var options = {apiUrl: api_url, token: token, data: data, tokenUrl: tokenUrl}; // for lib
+            var arrays = [calling_id, selected_value, element_id, element_name]; // for callback
+
+            var apiHeaders = [
+                {
+                    key: "Content-Type",
+                    value: 'application/json'
+                },
+                {
+                    key: "client-id",
+                    value: 'OSS_BIDA'
+                },
+            ];
+
+            apiCallGet(e, options, apiHeaders, callbackResponse, arrays);
+
+        })
+
+        $(document).on('change', ".business_type_1", function () {
+            //test
+            var a = this.id;
+            var d_id = a.split("_").pop()
+
+            var self = $(this);
+            $(self).next().hide();
+            $(this).after('<span class="loading_data">Loading...</span>');
+            $('#business_type_2_' + d_id).html('<option value="">Please Wait...</option>');
+            var business_type_1 = $("#businessType1_" + d_id).val();
+            //alert(desc_load);
+            var business_type_1_id = business_type_1.split("@")[0];
+            if (business_type_1_id) {
+                var e = $(this);
+                var api_url = "{{$tl_dscc_service_url}}/type2-by-type1/" + business_type_1_id
+                var selected_value = $(this).attr("data-value2");
+                var calling_id = $(this).attr('id');
+                var dependent_section_id = "businessType2_" + d_id; // for callback
+                var element_id = "type_2_id"; //dynamic id for callback
+                var element_name = "name_en"; //dynamic name for callback
+                var element_fee = "fee"
+                var options = {apiUrl: api_url, token: token, tokenUrl: tokenUrl};
+                var arrays = [calling_id, selected_value, element_id, element_name, element_fee, dependent_section_id];
+
+                var apiHeaders = [
+                    {
+                        key: "Content-Type",
+                        value: 'application/json'
+                    },
+                    {
+                        key: "client-id",
+                        value: 'OSS_BIDA_DEV_N'
+                    },
+                ];
+                apiCallGet(e, options, apiHeaders, BusinessTypeDependantCallbackResponse, arrays);
+
+            } else {
+                $(".business_type_2").html('<option value="">Select Business Type 1 First</option>');
+                $(self).next().hide();
+            }
+
+        });
+
+
+        $('#identity_type').on('change', function (el) {
+            let identityType = $(this).val();
+            if (identityType ==  'nid'){
+                $("#nidDiv").show();
+                $("#passportDiv").hide();
+                $("#nid_number").addClass('required');
+                $("#passport").removeClass('required');
+            }else if(identityType == 'passport'){
+                $("#nidDiv").hide();
+                $("#passportDiv").show();
+                $("#nid_number").removeClass('required');
+                $("#passport").addClass('required');
+            }
+        });
+
+        $('#zone').on('keydown', function (el) {
+            var key = el.which;
+            if (typeof key !== "undefined") {
+                return false;
+            }
+
+            $(this).after('<span class="loading_data">Loading...</span>');
+            var e = $(this);
+            var api_url = "{{$tl_dscc_service_url}}/zones";
+            var selected_value = '{{!empty($appData->zone) ? $appData->zone : ''}}'; // for callback
+            var calling_id = $(this).attr('id'); // for callback
+            var element_id = "zone_id"; //dynamic id for callback
+            var element_name = "name_en"; //dynamic name for callback
+            var data = '';
+            var options = {apiUrl: api_url, token: token, data: data, tokenUrl: tokenUrl}; // for lib
+            var arrays = [calling_id, selected_value, element_id, element_name]; // for callback
+
+            var apiHeaders = [
+                {
+                    key: "Content-Type",
+                    value: 'application/json'
+                },
+                {
+                    key: "client-id",
+                    value: 'OSS_BIDA'
+                },
+            ];
+
+            apiCallGet(e, options, apiHeaders, callbackResponse, arrays);
+
+        })
+
+        $('#business_org_nature').on('keydown', function (el) {
+            var key = el.which;
+            if (typeof key !== "undefined") {
+                return false;
+            }
+
+            $(this).after('<span class="loading_data">Loading...</span>');
+            var e = $(this);
+            var api_url = "{{$tl_dscc_service_url}}/business-nature";
+            var selected_value = '{{!empty($appData->business_org_nature) ? $appData->business_org_nature : ''}}';
+            ; // for callback
+            var calling_id = $(this).attr('id'); // for callback
+            var element_id = "bn_id"; //dynamic id for callback
+            var element_name = "name_en"; //dynamic name for callback
+            var data = '';
+            var options = {apiUrl: api_url, token: token, data: data, tokenUrl: tokenUrl}; // for lib
+            var arrays = [calling_id, selected_value, element_id, element_name]; // for callback
+
+            var apiHeaders = [
+                {
+                    key: "Content-Type",
+                    value: 'application/json'
+                },
+                {
+                    key: "client-id",
+                    value: 'OSS_BIDA'
+                },
+            ];
+
+            apiCallGet(e, options, apiHeaders, businessNatureCallbackResponse, arrays);
+
+        })
+
+        $('#paid_capital').on('keydown', function (el) {
+            var key = el.which;
+            if (typeof key !== "undefined") {
+                return false;
+            }
+
+            $(this).after('<span class="loading_data">Loading...</span>');
+            var e = $(this);
+            var api_url = "{{$tl_dscc_service_url}}/paid-up-capitals";
+            var selected_value = '{{!empty($appData->paid_capital) ? $appData->paid_capital : ''}}'; // for callback
+            var calling_id = $(this).attr('id'); // for callback
+            var element_id = "paid_up_id"; //dynamic id for callback
+            var element_name = "capital_range"; //dynamic name for callback
+            var data = 'fee';
+            var options = {apiUrl: api_url, token: token, data: data, tokenUrl: tokenUrl}; // for lib
+            var arrays = [calling_id, selected_value, element_id, element_name, data]; // for callback
+
+            var apiHeaders = [
+                {
+                    key: "Content-Type",
+                    value: 'application/json'
+                },
+                {
+                    key: "client-id",
+                    value: 'OSS_BIDA'
+                },
+            ];
+
+            apiCallGet(e, options, apiHeaders, callbackResponse, arrays);
+
+        })
+
+        $('#zone').on('change', function (el) {
+            var key = el.which;
+            if (typeof key !== "undefined") {
+                return false;
+            }
+            var self = $(this);
+            $(self).next().hide()
+            $("#ward").html('<option value="">Please Wait...</option>')
+            var zone = $(this).val()
+            var zone_id = zone.split('@')[0]
+            if (zone_id) {
+                $(this).after('<span class="loading_data">Loading...</span>');
+                var e = $(this);
+                var api_url = "{{$tl_dscc_service_url}}/wards-by-zone/" + zone_id
+                var selected_value = '{{!empty($appData->ward) ? $appData->ward : ''}}';
+                ; // for callback
+                var calling_id = $(this).attr('id'); // for callback
+                var element_id = "ward_id"; //dynamic id for callback
+                var element_name = "name_en"; //dynamic name for callback
+                var data = '';
+                var dependent_section_id = "ward";
+                var options = {apiUrl: api_url, token: token, data: data, tokenUrl: tokenUrl}; // for lib
+                var arrays = [calling_id, selected_value, element_id, element_name, dependent_section_id]; // for callback
+
+                var apiHeaders = [
+                    {
+                        key: "Content-Type",
+                        value: 'application/json'
+                    },
+                    {
+                        key: "client-id",
+                        value: 'OSS_BIDA'
+                    },
+                ];
+
+                apiCallGet(e, options, apiHeaders, dependantCallbackResponse, arrays);
+
+            } else {
+                $("#ward").html('<option value="">Select Zone First</option>')
+                $(self).next().hide();
+            }
+        })
+
+
+        $(document).on('change', ".business_type_2", function () {
+            var fee = $(this).find(':selected').attr('data-fee')
+            if (typeof fee !== "undefined") {
+                var id = $(this).attr('id')
+                var dynamic_id = id.split("_").pop()
+                $('#businessLicenseFee_' + dynamic_id).val(fee)
+                sum_fee_total()
+            }
+        })
+        $("#business_org_nature").on('change', function () {
+            $("#license_fee").val('')
+            vatCount()
+            var business_nature = $('#business_org_nature').val()
+            if (business_nature !== '') {
+                var bn = business_nature.split('@')[0]
+                if (bn == 'LTD') {
+                    $("#paid_capital").trigger('change')
+                } else {
+                    $('.business_type_2').trigger('change')
+                    vatCount()
+                }
+            } else {
+                $("#license_fee").val('')
+                vatCount()
+            }
+        })
+
+        $("#paid_capital").on('change', function () {
+            var business_nature = $('#business_org_nature').val()
+            if (business_nature !== '' && business_nature !== null) {
+                var bn = business_nature.split('@')[0]
+                if (bn == 'LTD') {
+                    if ($("#paid_capital").val() !== null) {
+                        var lc_fee = $("#paid_capital").val().split('@')[1]
+                        $("#license_fee").val(lc_fee)
+                        vatCount()
+                    }
+                }
+            }
+        })
+
+        $(document).on('input', "#sign_board_sqft", function () {
+            var sbsqft = $("#sign_board_sqft").val();
+            if (sbsqft !== '') {
+                var fee = sbsqft * 80
+                $("#sign_board_fee").val(fee.toFixed(2))
+            } else {
+                $("#sign_board_fee").val('')
+            }
+        })
+
+        $(document).on('change', "#number_of_years_for_fee", function () {
+            vatCount()
+        })
+
+        $(document).on('input', "#sign_board_sqft", function () {
+            vatCount()
+        })
+
+        $(document).on('click', '.filedelete', function () {
+            var abc = $(this).attr('docid');
+            var sure_del = confirm("Are you sure you want to delete this file?");
+            if (sure_del) {
+                document.getElementById("validate_field_" + abc).value = '';
+                document.getElementById(abc).value = '';
+                $('.saved_file_' + abc).html('');
+                $('.span_validate_field_' + abc).html('');
+            } else {
+                return false;
+            }
+        });
+
+    })
+
+    function vatCount() {
+        var lc_fee = $("#license_fee").val()
+        if (lc_fee !== '') {
+            var year = $('#number_of_years_for_fee').find(':selected').val().split('@')[0]
+            var an_vat = (lc_fee * 15) / 100
+            $("#annual_vat").val(an_vat)
+            var total_vat = an_vat * year
+            $("#total_vat").val(total_vat)
+            var signboard_fee = $("#sign_board_fee").val()
+            if (signboard_fee !== '') {
+                var total_price = parseInt(total_vat) + parseInt(lc_fee * year) +
+                    parseInt(signboard_fee)
+                $("#total_price").val(total_price)
+            } else {
+                var total_price = parseInt(total_vat) + parseInt(lc_fee * year)
+                $("#total_price").val(total_price)
+            }
+        } else {
+            $("#annual_vat").val('')
+            $("#total_vat").val('')
+            $("#total_price").val('')
+        }
+
+    }
+
+    function sum_fee_total() {
+        var sum = 0;
+        $.each($(".businessLicenseFee"), function () {
+            sum += +$(this).val();
+        });
+        if (sum > 0) {
+            var business_nature = $('#business_org_nature').val()
+            if (business_nature !== '') {
+                var bn = business_nature.split('@')[0]
+                if (bn !== 'LTD') {
+                    $("#license_fee").val(sum)
+                }
+            }
+            $("#number_of_years_for_fee").trigger('change')
+        } else {
+            $("#license_fee").val('')
+        }
+
+
+    }
+
+    function callbackResponse(response, [calling_id, selected_value, element_id, element_name, data]) {
+        var option = '<option value="">Select One</option>';
+
+        if (response.responseCode === 200) {
+            $.each(response.data, function (key, row) {
+                if (data == '' || data == null) {
+                    var id = row[element_id] + '@' + row[element_name];
+                } else {
+                    var id = row[element_id] + '@' + row[data] + '@' + row[element_name];
+                }
+                var value = row[element_name];
+                if (selected_value.split('@')[0] == id.split('@')[0]) {
+                    option += '<option selected="true" value="' + id + '">' + value + '</option>';
+                } else {
+                    option += '<option value="' + id + '">' + value + '</option>';
+                }
+            });
+        }
+
+        $("#" + calling_id).html(option)
+        $("#" + calling_id).next().hide()
+        $("#" + calling_id).trigger('change')
+    }
+
+    function businessNatureCallbackResponse(response, [calling_id, selected_value, element_id, element_name, data]) {
+        var option = '<option value="">Select One</option>';
+
+        if (response.responseCode === 200) {
+            $.each(response.data, function (key, row) {
+                if (data == '' || data == null) {
+                    var id = row[element_id] + '@' + row[element_name];
+                } else {
+                    var id = row[element_id] + '@' + row[data] + '@' + row[element_name];
+                }
+                var value = row[element_name];
+                if (selected_value.split('@')[0] == id.split('@')[0]) {
+                    option += '<option selected="true" value="' + id + '">' + value + '</option>';
+                } else {
+                    option += '<option value="' + id + '">' + value + '</option>';
+                }
+            });
+        }
+
+        $("#" + calling_id).html(option)
+        $("#" + calling_id).next().hide()
+        $("#" + calling_id).trigger('change')
+        $("#paid_capital").trigger('change')
+    }
+
+    function dependantCallbackResponse(response, [calling_id, selected_value, element_id, element_name, dependent_section_id]) {
+        var option = '<option value="">Select One</option>'
+        if (response.responseCode === 200) {
+            $.each(response.data, function (key, row) {
+                var id = row[element_id] + '@' + row[element_name]
+                var value = row[element_name]
+                if (selected_value.split('@')[0] == id.split('@')[0]) {
+                    option += '<option selected="true" value="' + id + '">' + value + '</option>'
+                } else {
+                    option += '<option value="' + id + '">' + value + '</option>'
+                }
+            });
+        }
+        $("#" + dependent_section_id).html(option)
+        $("#" + calling_id).next().hide()
+    }
+
+    function BusinessTypeDependantCallbackResponse(response, [calling_id, selected_value, element_id, element_name, element_fee, dependent_section_id]) {
+        var option = '<option value="">Select One</option>'
+        if (response.responseCode === 200) {
+            $.each(response.data, function (key, row) {
+                var id = row[element_id] + '@' + row[element_name]
+                var value = row[element_name]
+                if (selected_value.split('@')[0] == id.split('@')[0]) {
+                    option += '<option selected="true" value="' + id + '" data-fee="' + row[element_fee] + '">' + value + '</option>'
+                } else {
+                    option += '<option value="' + id + '" data-fee="' + row[element_fee] + '">' + value + '</option>'
+                }
+            });
+        }
+        $("#" + dependent_section_id).html(option)
+        $("#" + dependent_section_id).select2()
+        $("#" + calling_id).next().hide()
+    }
+
+
+    // Add table Row script
+    function addTableRowTL(tableID, templateRow) {
+        //rowCount++;
+        //Direct Copy a row to many times
+        $('.business_type_1').select2('destroy');
+        $('.business_type_2').select2('destroy');
+        var x = document.getElementById(templateRow).cloneNode(true);
+        x.id = "";
+        x.style.display = "";
+        var table = document.getElementById(tableID);
+        var rowCount = $('#' + tableID).find('tr').length - 1;
+        var lastTr = $('#' + tableID).find('tr').last().attr('data-number');
+        if (lastTr != '' && typeof lastTr !== "undefined") {
+            rowCount = parseInt(lastTr) + 1;
+        }
+        //var rowCount = table.rows.length;
+        //Increment id
+        var rowCo = rowCount;
+        var idText = 'rowCount' + tableID + '_' + rowCount;
+        x.id = idText;
+        $("#" + tableID).append(x);
+        //get select box elements
+        var attrSel = $("#" + tableID).find('#' + idText).find('select');
+        //edited by ishrat to solve select box id auto increment related bug
+        for (var i = 0; i < attrSel.length; i++) {
+            var nameAtt = attrSel[i].name;
+            var selectId = attrSel[i].id;
+            var repText = nameAtt.replace('[0]', '[' + rowCo + ']'); //increment all array element name
+            var ret = selectId.split('_')[0];
+            var repTextId = ret + '_' + rowCo;
+            attrSel[i].id = repTextId;
+            attrSel[i].name = repText;
+        }
+        attrSel.val(''); //value reset
+
+        // end of  solving issue related select box id auto increment related bug by ishrat
+
+        //get input elements
+        var attrInput = $("#" + tableID).find('#' + idText).find('input');
+        for (var i = 0; i < attrInput.length; i++) {
+            var nameAtt = attrInput[i].name;
+            var inputId = attrInput[i].id;
+            var repText = nameAtt.replace('[0]', '[' + rowCo + ']'); //increment all array element name
+            var ret = inputId.split('_')[0];
+            var repTextId = ret + '_' + rowCo;
+            attrInput[i].id = repTextId;
+            attrInput[i].name = repText;
+        }
+        attrInput.val(''); //value reset
+        //edited by ishrat to solve textarea id auto increment related bug
+        //get textarea elements
+        var attrTextarea = $("#" + tableID).find('#' + idText).find('textarea');
+        for (var i = 0; i < attrTextarea.length; i++) {
+            var nameAtt = attrTextarea[i].name;
+            //increment all array element name
+            var repText = nameAtt.replace('[0]', '[' + rowCo + ']');
+            attrTextarea[i].name = repText;
+            $('#' + idText).find('.readonlyClass').prop('readonly', true);
+        }
+        attrTextarea.val(''); //value reset
+        // end of  solving issue related textarea id auto increment related bug by ishrat
+        attrSel.prop('selectedIndex', 0);
+        if ((tableID === 'machinaryTbl' && templateRow === 'rowMachineCount0') || (tableID === 'machinaryTbl' && templateRow === 'rowMachineCount')) {
+            $("#" + tableID).find('#' + idText).find('select.m_currency').val("107");  //selected index reset
+        } else {
+            attrSel.prop('selectedIndex', 0);  //selected index reset
+        }
+        //$('.m_currency ').prop('selectedIndex', 102);
+        //Class change by btn-danger to btn-primary
+        $("#" + tableID).find('#' + idText).find('.addTableRows').removeClass('btn-primary').addClass('btn-danger')
+            .attr('onclick', 'removeTableRow("' + tableID + '","' + idText + '")');
+        $("#" + tableID).find('#' + idText).find('.addTableRows > .fa').removeClass('fa-plus').addClass('fa-times');
+        $('#' + tableID).find('tr').last().attr('data-number', rowCount);
+
+        $('.business_type_1').each(function (index) {
+            $('#businessType1_' + index).select2();
+        });
+        $('.business_type_2').each(function (index) {
+            $('#businessType2_' + index).select2();
+        });
+
+        $("#" + tableID).find('#' + idText).find('.onlyNumber').on('keydown', function (e) {
+            //period decimal
+            if ((e.which >= 48 && e.which <= 57)
+                //numpad decimal
+                || (e.which >= 96 && e.which <= 105)
+                // Allow: backspace, delete, tab, escape, enter and .
+                || $.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1
+                // Allow: Ctrl+A
+                || (e.keyCode == 65 && e.ctrlKey === true)
+                // Allow: Ctrl+C
+                || (e.keyCode == 67 && e.ctrlKey === true)
+                // Allow: Ctrl+V
+                || (e.keyCode == 86 && e.ctrlKey === true)
+                // Allow: Ctrl+X
+                || (e.keyCode == 88 && e.ctrlKey === true)
+                // Allow: home, end, left, right
+                || (e.keyCode >= 35 && e.keyCode <= 39)) {
+                var $this = $(this);
+                setTimeout(function () {
+                    $this.val($this.val().replace(/[^0-9.]/g, ''));
+                }, 4);
+                var thisVal = $(this).val();
+                if (thisVal.indexOf(".") != -1 && e.key == '.') {
+                    return false;
+                }
+                $(this).removeClass('error');
+                return true;
+            } else {
+                $(this).addClass('error');
+                return false;
+            }
+        }).on('paste', function (e) {
+            var $this = $(this);
+            setTimeout(function () {
+                $this.val($this.val().replace(/[^.0-9]/g, ''));
+            }, 4);
+        });
+
+
+    } // end of addTableRowTraHis() function
+
+    // Remove Table row script
+    function removeTableRow(tableID, removeNum) {
+        $('#' + tableID).find('#' + removeNum).remove();
+        sum_fee_total()
+        var index = 0
+        var rowCo = 0
+        $('#' + tableID + ' tr').each(function () {
+                var trId = $(this).attr("id")
+                var id = trId.split("_").pop();
+                var trName = trId.split("_").shift();
+                var nameIndex = id;
+
+                var attrInput = $("#" + tableID).find('#' + trId).find('input');
+                for (var i = 0; i < attrInput.length; i++) {
+                    var nameAtt = attrInput[i].name;
+                    var inputId = attrInput[i].id;
+                    var repText = nameAtt.replace('[' + nameIndex + ']', '[' + index + ']'); //increment all array element name
+                    var ret = inputId.replace('_' + id, '');
+                    var repTextId = ret + '_' + rowCo;
+                    attrInput[i].id = repTextId;
+                    attrInput[i].name = repText;
+                }
+
+
+                var attrSel = $("#" + tableID).find('#' + trId).find('select');
+
+                for (var i = 0; i < attrSel.length; i++) {
+                    var nameAtt = attrSel[i].name;
+                    var inputId = attrSel[i].id;
+                    var repText = nameAtt.replace('[' + nameIndex + ']', '[' + index + ']'); //increment all array element name
+                    // alert(nameIndex + ' ' + index)
+                    var ret = inputId.replace('_' + id, '');
+                    var repTextId = ret + '_' + rowCo;
+                    attrSel[i].id = repTextId;
+                    attrSel[i].name = repText;
+                }
+                var ret = trId.replace('_' + id, '');
+                var repTextId = ret + '_' + rowCo;
+                $(this).removeAttr("id")
+                $(this).attr("id", repTextId)
+                $(this).removeAttr("data-number")
+                $(this).attr("data-number", rowCo)
+
+                if (rowCo != 0) {
+                    $(this).find('.addTableRows').removeAttr('onclick');
+                    $(this).find('.addTableRows').attr('onclick', 'removeTableRow("' + tableID + '","' + trName + '_' + rowCo + '")');
+                }
+                index++;
+                rowCo++;
+
+            }
+        )
+
+    }
+
+    function getDistrictByDivisionCustom(division_id, division_value, district_div, old_data) {
+        // define old_data as an optional parameter
+        if (typeof old_data === 'undefined') {
+            old_data = 0;
+        }
+        var div_id = division_value.split('@')[0]
+        var _token = $('input[name="_token"]').val();
+        if (division_value !== '') {
+            $("#" + division_id).after('<span class="loading_data">Loading...</span>');
+            $.ajax({
+                type: "GET",
+                url: "/users/get-district-by-division",
+                data: {
+                    _token: _token,
+                    divisionId: div_id
+                },
+                success: function (response) {
+                    var option = '<option value="">Select One</option>';
+                    if (response.responseCode == 1) {
+                        $("#" + district_div).select2('destroy');
+                        $.each(response.data, function (id, value) {
+                            var element_id = (id + '@' + value)
+                            if (element_id == old_data) {
+                                option += '<option value="' + element_id + '" selected>' + value + '</option>';
+                            } else {
+                                option += '<option value="' + element_id + '">' + value + '</option>';
+                            }
+                        });
+                    }
+                    $("#" + district_div).html(option);
+                    $("#" + district_div).select2();
+                    $("#" + division_id).parent().find('.loading_data').hide();
+                    $('#' + division_id).trigger('change');
+                }
+            });
+        }
+    }
+
+    function getThanaByDistrictCustom(division_id, division_value, district_div, old_data) {
+        // define old_data as an optional parameter
+        if (typeof old_data === 'undefined') {
+            old_data = 0;
+        }
+        var div_id = division_value.split('@')[0]
+        var _token = $('input[name="_token"]').val();
+        if (division_value !== '') {
+            $.ajax({
+                type: "GET",
+                url: "/users/get-district-by-division",
+                data: {
+                    _token: _token,
+                    divisionId: div_id
+                },
+                success: function (response) {
+                    $("#" + district_div).select2('destroy');
+                    var option = '<option value="">Select One</option>';
+                    if (response.responseCode == 1) {
+                        $.each(response.data, function (id, value) {
+                            var element_id = (id + '@' + value)
+                            if (element_id == old_data) {
+                                option += '<option value="' + element_id + '" selected>' + value + '</option>';
+                            } else {
+                                option += '<option value="' + element_id + '">' + value + '</option>';
+                            }
+                        });
+                    }
+                    $("#" + district_div).html(option);
+                    $("#" + district_div).select2();
+                    $("#" + district_div).parent().find('.loading_data').hide();
+                }
+            });
+        }
+    }
+
+    $(document).ready(function () {
+        $('.select2input').select2();
+    })
+
+</script>

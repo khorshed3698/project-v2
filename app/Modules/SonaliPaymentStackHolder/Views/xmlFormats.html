@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>xml Formats</title>
+</head>
+<!--Session Token Request-->
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope
+        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Header>
+        <SpgUserCredentials xmlns="http://tempuri.org/">
+            <userName>duUser2014</userName>
+            <password>duUserPayment2014</password>
+        </SpgUserCredentials>
+    </soap:Header>
+    <soap:Body>
+        <GetSessionKey xmlns="http://tempuri.org/">
+            <strUserId>duUser2014</strUserId>
+            <strPassKey>duUserPayment2014</strPassKey>
+            <strRequestId>0102011367</strRequestId>
+            <strAmount>250</strAmount>
+            <strTranDate>2019-01-10</strTranDate>
+            <strAccounts>0002634313655</strAccounts>
+        </GetSessionKey>
+    </soap:Body>
+</soap:Envelope>
+
+
+<!--Request Function (POST & Redirect )-->
+<body onload='document.forms[0].submit()'>
+<form name='PostForm' method='POST' action='{{ $spg_config['web_portal_url'] }}'>
+<textarea name='datarequest' id='datarequest' rows='15' style='width:100%; display:none;'>
+<SpsRequestByeChallan>
+<RequestInformation>
+ <Authentication>
+<ApiAccessUserId>duUser2014</ApiAccessUserId>
+<AuthenticationKey>OTSEuyNF2B3kWSPfsHgmIPyuqqhMKi\/wUKT8TE9T0Ai11mztfk9visAdFa1Qb5d82F6H4QsGyy54jBWUpN0Z487UcH65yO9x</AuthenticationKey>
+ </Authentication>
+ <ReferenceInfo>
+<RequestId>0102011367</RequestId>
+<RefTranNo>749952710</RefTranNo>
+<RefTranDateTime>2019-01-10 15:53:42</RefTranDateTime>
+<ReturnUrl>'/spg/callback'</ReturnUrl>
+<ReturnMethod>POST</ReturnMethod>
+<TranAmount>250</TranAmount>
+<ContactName>Imranul Sazzad</ContactName>
+<ContactNo>+8801710622883</ContactNo>
+<PayerId>NULL</PayerId>
+<Address>Address</Address>
+ </ReferenceInfo>
+ <CreditInformation>
+<CreditInfo>
+<SLNO>1</SLNO>
+<CreditAccount>0002634313655</CreditAccount>
+<CrAmount>200</CrAmount>
+<Purpose>Test</Purpose>
+<Onbehalf>Test</Onbehalf>
+</CreditInfo>
+ </CreditInformation>
+</RequestInformation>
+</SpsRequestByeChallan>
+</textarea></form>
+</body>
+
+
+<!--Verification Request-->
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Header>
+        <SpgUserCredentials xmlns="http://tempuri.org/">
+            <userName>duUser2014</userName>
+            <password>duUserPayment2014</password>
+        </SpgUserCredentials>
+    </soap:Header>
+    <soap:Body>
+        <TransactionVerification
+                xmlns="http://tempuri.org/">
+            <OwnerCode>du</OwnerCode>
+            <ReferenceDate>2019-01-10</ReferenceDate>
+            <RequiestNo>0102011367</RequiestNo>
+            <isEncPwd>true</isEncPwd>
+        </TransactionVerification>
+    </soap:Body>
+</soap:Envelope>
+
+</html>
