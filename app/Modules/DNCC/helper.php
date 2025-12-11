@@ -1,5 +1,0 @@
-<?php
-
-/**
- *	DNCC Helper  
- */

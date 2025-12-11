@@ -1,5 +1,0 @@
-<?php
-
-/**
- *    DCCI COS Helper
- */

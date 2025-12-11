@@ -1,5 +1,0 @@
-<?php
-
-/**
- *	ExternalTest Helper  
- */

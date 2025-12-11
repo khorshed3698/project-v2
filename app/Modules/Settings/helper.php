@@ -1,4 +1,0 @@
-<?php
- /**
- *	Settings Helper  
- */

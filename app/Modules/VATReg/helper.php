@@ -1,5 +1,0 @@
-<?php
-
-/**
- *	VATReg Helper  
- */

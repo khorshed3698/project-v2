@@ -1,5 +1,0 @@
-<?php
-
-/**
- *    NewConnectionNESCO Helper
- */
